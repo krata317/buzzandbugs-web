@@ -1,0 +1,398 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------------------
+   Design tokens
+   Light is a warm paper neutral rather than pure white; dark is a near-black
+   graphite with slightly lifted surfaces. Both are hand-tuned, not inverted.
+--------------------------------------------------------------------------- */
+:root {
+  --canvas: 251 250 249;
+  --surface: 255 255 255;
+  --raised: 244 242 239;
+  --line: 230 226 220;
+  --line-strong: 211 205 196;
+  --ink: 24 21 17;
+  --muted: 104 97 86;
+  --subtle: 145 137 124;
+  --shadow: 26 22 16;
+
+  --up: 199 62 36;
+  --down: 66 88 165;
+  --danger: 185 28 28;
+  --danger-ink: 255 255 255;
+
+  --accent: 109 74 255;
+  --accent-ink: 255 255 255;
+  --accent-soft: 109 74 255;
+}
+
+.dark {
+  --canvas: 12 12 14;
+  --surface: 20 20 23;
+  --raised: 27 27 31;
+  --line: 39 39 44;
+  --line-strong: 58 58 65;
+  --ink: 240 239 236;
+  --muted: 156 152 144;
+  --subtle: 118 114 107;
+  --shadow: 0 0 0;
+
+  --up: 255 138 110;
+  --down: 138 166 240;
+  --danger: 248 113 113;
+  --danger-ink: 26 8 8;
+
+  --accent: 166 139 250;
+  --accent-ink: 14 12 22;
+  --accent-soft: 166 139 250;
+}
+
+[data-accent='violet'] {
+  --accent: 109 74 255;
+  --accent-ink: 255 255 255;
+}
+[data-accent='blue'] {
+  --accent: 37 99 235;
+  --accent-ink: 255 255 255;
+}
+[data-accent='green'] {
+  --accent: 14 124 74;
+  --accent-ink: 255 255 255;
+}
+[data-accent='amber'] {
+  --accent: 176 82 9;
+  --accent-ink: 255 255 255;
+}
+[data-accent='rose'] {
+  --accent: 211 38 112;
+  --accent-ink: 255 255 255;
+}
+[data-accent='teal'] {
+  --accent: 13 116 108;
+  --accent-ink: 255 255 255;
+}
+[data-accent='slate'] {
+  --accent: 71 85 105;
+  --accent-ink: 255 255 255;
+}
+
+.dark[data-accent='violet'] {
+  --accent: 166 139 250;
+  --accent-ink: 14 12 22;
+}
+.dark[data-accent='blue'] {
+  --accent: 122 162 255;
+  --accent-ink: 9 14 26;
+}
+.dark[data-accent='green'] {
+  --accent: 92 209 148;
+  --accent-ink: 6 20 13;
+}
+.dark[data-accent='amber'] {
+  --accent: 240 176 74;
+  --accent-ink: 24 15 3;
+}
+.dark[data-accent='rose'] {
+  --accent: 250 133 165;
+  --accent-ink: 26 8 15;
+}
+.dark[data-accent='teal'] {
+  --accent: 84 205 194;
+  --accent-ink: 6 20 19;
+}
+.dark[data-accent='slate'] {
+  --accent: 160 174 194;
+  --accent-ink: 12 15 20;
+}
+
+/* ---------------------------------------------------------------------------
+   Base
+--------------------------------------------------------------------------- */
+@layer base {
+  * {
+    @apply border-line;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-canvas text-ink font-sans antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'ss01';
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: rgb(var(--accent) / 0.24);
+    color: rgb(var(--ink));
+  }
+
+  :focus-visible {
+    outline: 2px solid rgb(var(--accent));
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: rgb(var(--line-strong) / 0.7);
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(var(--subtle) / 0.6);
+    background-clip: content-box;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Components
+--------------------------------------------------------------------------- */
+@layer components {
+  .card {
+    @apply rounded-xl border border-line bg-surface;
+  }
+
+  .card-interactive {
+    @apply card transition-[border-color,box-shadow,transform] duration-200 ease-out;
+  }
+
+  .card-interactive:hover {
+    @apply border-lineStrong shadow-soft;
+  }
+
+  .field {
+    @apply w-full rounded-md border border-line bg-surface px-3 py-2.5 text-sm text-ink
+      placeholder:text-subtle transition-colors duration-150;
+  }
+
+  .field:hover {
+    @apply border-lineStrong;
+  }
+
+  .field:focus {
+    @apply border-accent outline-none ring-2 ring-accent/20;
+  }
+
+  .field[aria-invalid='true'] {
+    @apply border-down/70 ring-2 ring-down/15;
+  }
+
+  .label {
+    @apply mb-1.5 block text-[13px] font-medium text-ink;
+  }
+
+  .hint {
+    @apply mt-1.5 text-xs leading-relaxed text-muted;
+  }
+
+  .nav-link {
+    @apply relative flex items-center gap-3 rounded-md px-3 py-2 text-[14px] font-medium
+      text-muted transition-colors duration-150;
+  }
+
+  .nav-link:hover {
+    @apply bg-raised text-ink;
+  }
+
+  .nav-link[aria-current='page'] {
+    @apply bg-raised text-ink;
+  }
+
+  .nav-link[aria-current='page']::before {
+    content: '';
+    @apply absolute left-0 top-1/2 h-4 w-[3px] -translate-y-1/2 rounded-r-full bg-accent;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5
+      text-[13px] font-medium text-muted transition-colors duration-150;
+  }
+
+  .chip:hover {
+    @apply border-lineStrong bg-raised text-ink;
+  }
+
+  .chip[data-active='true'] {
+    @apply border-accent/30 bg-accent/10 text-accent;
+  }
+
+  .meta {
+    @apply font-mono text-2xs uppercase tracking-[0.14em] text-subtle;
+  }
+
+  .skeleton {
+    @apply relative overflow-hidden rounded-md bg-raised;
+  }
+
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0 -translate-x-full animate-shimmer;
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      rgb(var(--line) / 0.9),
+      transparent
+    );
+  }
+
+  .divider {
+    @apply h-px w-full bg-line;
+  }
+
+  /* Rich text output ---------------------------------------------------- */
+  .post-body {
+    @apply text-[15.5px] leading-[1.72] text-ink;
+    overflow-wrap: anywhere;
+  }
+
+  .post-body p {
+    @apply my-3 first:mt-0 last:mb-0;
+  }
+
+  .post-body ul {
+    @apply my-3 list-disc space-y-1.5 pl-5 marker:text-subtle;
+  }
+
+  .post-body li > p {
+    @apply my-0;
+  }
+
+  .post-body strong {
+    @apply font-semibold;
+  }
+
+  .post-body em {
+    @apply italic;
+  }
+
+  .post-body u {
+    @apply underline underline-offset-2;
+  }
+
+  .post-body a {
+    @apply text-accent underline decoration-accent/40 underline-offset-2 transition-colors;
+  }
+
+  .post-body a:hover {
+    @apply decoration-accent;
+  }
+
+  .mention {
+    @apply rounded bg-accent/10 px-1 py-0.5 font-medium text-accent no-underline;
+  }
+
+  /* Editor --------------------------------------------------------------- */
+  .editor-surface {
+    @apply text-[15.5px] leading-[1.72] text-ink;
+  }
+
+  .editor-surface .tiptap {
+    @apply min-h-[132px] outline-none;
+  }
+
+  .editor-surface .tiptap p {
+    @apply my-2 first:mt-0 last:mb-0;
+  }
+
+  .editor-surface .tiptap ul {
+    @apply my-2 list-disc space-y-1 pl-5;
+  }
+
+  .editor-surface .tiptap a {
+    @apply text-accent underline underline-offset-2;
+  }
+
+  .editor-surface .tiptap p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    @apply pointer-events-none float-left h-0 text-subtle;
+  }
+
+  .editor-surface .tiptap .mention {
+    @apply select-none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Utilities
+--------------------------------------------------------------------------- */
+@layer utilities {
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent
+      focus-visible:ring-offset-2 focus-visible:ring-offset-canvas;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animate-delay-1 {
+    animation-delay: 60ms;
+  }
+  .animate-delay-2 {
+    animation-delay: 120ms;
+  }
+  .animate-delay-3 {
+    animation-delay: 180ms;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Motion preferences
+--------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Native dialog backdrop */
+dialog::backdrop {
+  background-color: rgb(var(--shadow) / 0.45);
+  backdrop-filter: blur(2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  dialog::backdrop {
+    backdrop-filter: none;
+  }
+}

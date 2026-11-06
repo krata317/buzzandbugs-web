@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en" data-accent="violet">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta
+      name="description"
+      content="Buzz and Bugs is a community for developers: discussions, curated tech news, trending open-source work and upcoming hackathons, contests and CTFs."
+    />
+    <meta name="theme-color" content="#fbfaf9" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0c0c0e" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <title>Buzz and Bugs</title>
+    <script>
+      (function () {
+        try {
+          var raw = localStorage.getItem('bnb.theme.v1');
+          var pref = raw ? JSON.parse(raw) : null;
+          var mode = pref && pref.mode ? pref.mode : 'system';
+          var dark =
+            mode === 'dark' ||
+            (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          var root = document.documentElement;
+          root.classList.toggle('dark', dark);
+          root.style.colorScheme = dark ? 'dark' : 'light';
+          if (pref && pref.accent) root.dataset.accent = pref.accent;
+        } catch (error) {
+          /* a corrupt preference should never block the app */
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
