@@ -30,7 +30,7 @@ function PublicHeader() {
               to={item.to}
               className={({ isActive }) =>
                 cn(
-                  'focus-ring rounded-md px-2.5 py-1.5 text-[13.5px] font-medium transition-colors',
+                  'nav-underline focus-ring rounded-md px-2.5 py-1.5 text-[13.5px] font-medium transition-colors',
                   isActive ? 'text-ink' : 'text-muted hover:text-ink',
                 )
               }

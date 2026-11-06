@@ -18,6 +18,7 @@ import { Logo } from '@/components/Logo';
 import { Button } from '@/components/ui/Button';
 import { LoadingBlock } from '@/components/ui/feedback';
 import { ConnectionBanner } from '@/components/layout/ConnectionBanner';
+import { ThemeToggle } from '@/components/layout/ThemeToggle';
 
 const ADMIN_NAV = [
   { to: '/admin', label: 'Overview', icon: Gauge, end: true },
@@ -62,10 +63,11 @@ export function AdminLayout() {
             Admin
           </span>
 
-          <div className="ml-auto flex items-center gap-3">
+          <div className="ml-auto flex items-center gap-2.5">
             <span className="hidden font-mono text-[10.5px] uppercase tracking-[0.08em] text-subtle sm:inline">
               {me.data.username}
             </span>
+            <ThemeToggle />
             <Button
               variant="ghost"
               size="sm"

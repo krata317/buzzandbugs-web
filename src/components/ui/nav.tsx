@@ -80,7 +80,12 @@ export function PageHeader({
   className,
 }: PageHeaderProps) {
   return (
-    <header className={cn('flex flex-wrap items-end justify-between gap-4 pb-5', className)}>
+    <header
+      className={cn(
+        'flex flex-wrap items-end justify-between gap-4 pb-5 animate-rise-in',
+        className,
+      )}
+    >
       <div className="min-w-0">
         {eyebrow ? <p className="meta mb-2">{eyebrow}</p> : null}
         <h1

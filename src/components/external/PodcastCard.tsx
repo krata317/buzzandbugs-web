@@ -1,14 +1,31 @@
 import { useState } from 'react';
-import { ArrowUpRight, Clock3, Play } from 'lucide-react';
+import { ArrowUpRight, Clock3 } from 'lucide-react';
 import type { ExternalItem } from '@/lib/api/types';
 import { cn } from '@/lib/cn';
 import { formatDate, formatDuration } from '@/lib/format';
 import { numberMeta, stringMeta } from '@/lib/sections';
 
 /**
- * Podcast episodes carry artwork, a publisher and a duration. Missing artwork falls back to
- * a neutral tile rather than a broken image.
+ * Artwork fallback for an episode that has no picture. The microphone is a static SVG asset,
+ * tinted from the current accent colour so it belongs to whichever theme is active.
  */
+export function PodcastArtworkFallback({ className }: { className?: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={cn(
+        'podcast-fallback relative flex h-full w-full items-center justify-center overflow-hidden',
+        className,
+      )}
+    >
+      <span className="podcast-fallback-plate absolute inset-0" />
+      <span className="podcast-fallback-mark" />
+    </span>
+  );
+}
+
+/** Podcast episodes carry artwork, a publisher and a duration. Missing artwork falls back to
+ * the microphone plate rather than a broken image or a play triangle. */
 export function PodcastCard({ item }: { item: ExternalItem }) {
   const [failed, setFailed] = useState(false);
   const duration = formatDuration(numberMeta(item.metadata, 'durationSeconds'));
@@ -22,7 +39,8 @@ export function PodcastCard({ item }: { item: ExternalItem }) {
       rel="noreferrer noopener"
       className={cn(
         'focus-ring group flex gap-3.5 rounded-lg border border-line bg-surface p-3.5',
-        'transition-[border-color,box-shadow] hover:border-lineStrong hover:shadow-soft',
+        'transition-[border-color,box-shadow,transform] duration-200 ease-out',
+        'hover:-translate-y-0.5 hover:border-lineStrong hover:shadow-soft',
       )}
     >
       <div className="relative h-[74px] w-[74px] shrink-0 overflow-hidden rounded-md border border-line bg-raised">
@@ -34,12 +52,10 @@ export function PodcastCard({ item }: { item: ExternalItem }) {
             decoding="async"
             referrerPolicy="no-referrer"
             onError={() => setFailed(true)}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+            className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.05]"
           />
         ) : (
-          <span className="flex h-full w-full items-center justify-center text-accent">
-            <Play size={18} aria-hidden="true" />
-          </span>
+          <PodcastArtworkFallback />
         )}
       </div>
 

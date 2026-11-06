@@ -2,8 +2,6 @@ import type { RichTextDoc, RichTextMark, RichTextNode } from './api/types';
 
 export const MAX_TITLE_LENGTH = 200;
 export const MAX_CONTENT_LENGTH = 20_000;
-export const EXCERPT_LENGTH = 280;
-
 const MARK_TYPES = new Set(['bold', 'italic', 'underline', 'link', 'fontSize']);
 
 export function isHttpUrl(value: string): boolean {

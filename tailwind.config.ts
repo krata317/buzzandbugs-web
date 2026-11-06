@@ -70,6 +70,10 @@ export default {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.55' },
         },
+        'float-slow': {
+          '0%, 100%': { transform: 'translate3d(0, 0, 0) scale(1)' },
+          '50%': { transform: 'translate3d(2%, -4%, 0) scale(1.08)' },
+        },
       },
       animation: {
         'fade-in': 'fade-in 180ms cubic-bezier(0.22, 1, 0.36, 1) both',
@@ -78,6 +82,7 @@ export default {
         'slide-up': 'slide-up 240ms cubic-bezier(0.22, 1, 0.36, 1) both',
         shimmer: 'shimmer 1.4s infinite',
         'pulse-soft': 'pulse-soft 1.6s ease-in-out infinite',
+        'float-slow': 'float-slow 20s ease-in-out infinite',
       },
     },
   },

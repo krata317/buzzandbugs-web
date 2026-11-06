@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { api, isApiError, isNetworkError } from '@/lib/api';
+import { api } from '@/lib/api';
 import { queryKeys } from '@/features/queryKeys';
 
 export interface HealthPayload {
@@ -67,8 +67,4 @@ export function useConnection(): ConnectionState {
       void healthQuery.refetch();
     },
   };
-}
-
-export function isConnectivityError(error: unknown): boolean {
-  return isNetworkError(error) || (isApiError(error) && error.status >= 500);
 }

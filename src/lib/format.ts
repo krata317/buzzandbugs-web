@@ -73,10 +73,6 @@ export function formatCount(value: number | null | undefined): string {
   return Math.abs(value) < 1000 ? plain.format(value) : compact.format(value);
 }
 
-export function formatExact(value: number): string {
-  return plain.format(value);
-}
-
 export function formatDuration(seconds: number | null | undefined): string | null {
   if (!seconds || seconds <= 0) return null;
   const hours = Math.floor(seconds / 3600);

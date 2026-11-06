@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { Field, Input } from '@/components/ui/form';
 import { InlineError } from '@/components/ui/feedback';
 import { ConnectionBanner } from '@/components/layout/ConnectionBanner';
+import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { useAdminMe } from '@/features/admin/queries';
 
 export function AdminLoginPage() {
@@ -48,7 +49,10 @@ export function AdminLoginPage() {
     <div className="flex min-h-screen flex-col">
       <ConnectionBanner />
       <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-4 py-12">
-        <Logo />
+        <div className="mb-10 flex items-center justify-between">
+          <Logo />
+          <ThemeToggle />
+        </div>
 
         <div className="mt-10 flex items-center gap-2">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-raised px-2 py-0.5 font-mono text-[9.5px] uppercase tracking-[0.12em] text-muted">
@@ -56,7 +60,6 @@ export function AdminLoginPage() {
             Operator access
           </span>
         </div>
-
         <h1 className="mt-3 text-[24px] font-semibold tracking-[-0.02em] text-ink">Admin sign in</h1>
         <p className="mt-1.5 text-[12.5px] leading-relaxed text-muted">
           A separate identity from user accounts. Sessions last twelve hours.
@@ -99,9 +102,8 @@ export function AdminLoginPage() {
         </form>
 
         <p className="mt-5 text-[11.5px] leading-relaxed text-subtle">
-          Create the first admin from the backend with{' '}
-          <code className="font-mono">npm run admin:create</code>. There is no public route for
-          creating one.
+          Operator accounts are provisioned separately from user accounts. Contact the platform owner
+          if you need access.
         </p>
       </div>
     </div>

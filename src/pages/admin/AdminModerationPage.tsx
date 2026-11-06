@@ -72,7 +72,7 @@ export function AdminModerationPage() {
       {cases.data && cases.data.length === 0 ? (
         <EmptyState
           title="No cases in this state"
-          description="Change the filter, or wait for a report to create a case."
+          description="Change the filter, or wait for an author to appeal an automated decision."
         />
       ) : null}
 

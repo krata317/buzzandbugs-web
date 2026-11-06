@@ -5,9 +5,8 @@ import {
   type ReactNode,
   type KeyboardEvent as ReactKeyboardEvent,
 } from 'react';
-import { createPortal } from 'react-dom';
-import { X } from 'lucide-react';
 import { cn } from '@/lib/cn';
+import { X } from 'lucide-react';
 import { IconButton } from './Button';
 
 /* ------------------------------------------------------------------ dialog */
@@ -206,54 +205,5 @@ export function Menu({ trigger, triggerLabel, items, align = 'end' }: MenuProps)
         </div>
       ) : null}
     </div>
-  );
-}
-
-/* --------------------------------------------------------------- mobile sheet */
-
-interface SheetProps {
-  open: boolean;
-  onClose: () => void;
-  title: string;
-  children: ReactNode;
-}
-
-export function Sheet({ open, onClose, title, children }: SheetProps) {
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', onKey);
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = previous;
-    };
-  }, [open, onClose]);
-
-  if (!open) return null;
-
-  return createPortal(
-    <div className="fixed inset-0 z-[70] lg:hidden" role="dialog" aria-modal="true" aria-label={title}>
-      <div
-        className="absolute inset-0 animate-fade-in bg-black/40"
-        onClick={onClose}
-        aria-hidden="true"
-      />
-      <div className="absolute inset-y-0 left-0 flex w-[86%] max-w-xs animate-slide-up flex-col border-r border-line bg-canvas">
-        <div className="flex items-center justify-between border-b border-line px-4 py-3">
-          <span className="text-[13px] font-semibold uppercase tracking-[0.12em] text-muted">
-            {title}
-          </span>
-          <IconButton label="Close menu" size="sm" onClick={onClose}>
-            <X size={16} />
-          </IconButton>
-        </div>
-        <div className="flex-1 overflow-y-auto p-3">{children}</div>
-      </div>
-    </div>,
-    document.body,
   );
 }

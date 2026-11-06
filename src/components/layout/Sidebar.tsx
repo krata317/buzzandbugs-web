@@ -1,19 +1,20 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import {
   Bell,
   CalendarDays,
-  ChevronLeft,
-  ChevronRight,
   LogOut,
   MessageSquare,
   Mic,
   Newspaper,
+  PanelLeftClose,
+  PanelLeftOpen,
   Settings,
   TrendingUp,
   User,
 } from 'lucide-react';
 import { cn } from '@/lib/cn';
+import { useClickOutside } from '@/hooks/useClickOutside';
 import { useAuth } from '@/providers/AuthProvider';
 import { useUnreadCount } from '@/features/notifications/queries';
 import { Avatar } from '@/components/ui/Avatar';
@@ -104,21 +105,7 @@ function AccountMenu({ collapsed }: { collapsed: boolean }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!open) return;
-    const onPointerDown = (event: MouseEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
-    };
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpen(false);
-    };
-    document.addEventListener('mousedown', onPointerDown);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onPointerDown);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [open]);
+  useClickOutside(rootRef, () => setOpen(false), open);
 
   if (!user) {
     if (collapsed) {
@@ -232,11 +219,38 @@ export function Sidebar({
       )}
       data-collapsed={collapsed}
     >
-      <div className={cn('flex items-center', collapsed ? 'justify-center' : 'justify-between px-2')}>
+      <div
+        className={cn(
+          'flex items-center gap-2',
+          collapsed ? 'flex-col' : 'justify-between pl-2 pr-1',
+        )}
+      >
         <Logo showWordmark={!collapsed} />
+
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-expanded={!collapsed}
+          aria-controls="app-sidebar-nav"
+          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          data-tooltip={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          className={cn(
+            'focus-ring inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md',
+            'border border-line bg-surface text-muted shadow-soft',
+            'transition-[color,border-color,background-color,transform] duration-150 ease-out',
+            'hover:border-accent/40 hover:bg-accent/5 hover:text-accent active:scale-95',
+          )}
+        >
+          {collapsed ? (
+            <PanelLeftOpen size={16} aria-hidden="true" />
+          ) : (
+            <PanelLeftClose size={16} aria-hidden="true" />
+          )}
+        </button>
       </div>
 
-      <nav aria-label="Primary" className="mt-7 space-y-0.5">
+      <nav id="app-sidebar-nav" aria-label="Primary" className="mt-6 space-y-0.5">
         {PRIMARY_NAV.map((item) => (
           <NavItem key={item.to} {...item} collapsed={collapsed} />
         ))}
@@ -280,17 +294,6 @@ export function Sidebar({
           </span>
           <div className={cn('flex items-center gap-1', collapsed && 'flex-col')}>
             <ThemeToggle />
-            <button
-              type="button"
-              onClick={onToggle}
-              aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-              aria-expanded={!collapsed}
-              title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-              data-tooltip={collapsed ? 'Expand sidebar' : undefined}
-              className="focus-ring relative inline-flex h-7 w-7 items-center justify-center rounded-md text-subtle transition-colors hover:bg-raised hover:text-ink"
-            >
-              {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-            </button>
           </div>
         </div>
 

@@ -5,6 +5,7 @@ import {
   MessageSquare,
   Mic,
   Newspaper,
+  Settings,
   TrendingUp,
 } from 'lucide-react';
 import { cn } from '@/lib/cn';
@@ -24,6 +25,14 @@ export function TopBar() {
       <Logo />
       <div className="flex items-center gap-1">
         <ThemeToggle />
+        <Link
+          to="/settings"
+          aria-label="Settings"
+          title="Settings"
+          className="focus-ring inline-flex h-8 w-8 items-center justify-center rounded-md text-muted transition-colors hover:bg-raised hover:text-ink"
+        >
+          <Settings size={17} aria-hidden="true" />
+        </Link>
         <Link
           to="/notifications"
           aria-label={count > 0 ? `Notifications, ${count} unread` : 'Notifications'}

@@ -120,7 +120,8 @@ export function PrivacyPage() {
             Warnings remain active for 150 days. Ban records are kept while the ban applies.
           </li>
           <li>
-            Administrative audit entries are kept until an administrator clears the audit log.
+            Administrative audit entries are kept until an administrator clears the audit log,
+            except for entries attached to a moderation case, which are deleted with that case.
           </li>
           <li>
             After an account is deleted, published posts and replies remain but are anonymised; the
