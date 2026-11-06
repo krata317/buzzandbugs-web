@@ -1,7 +1,5 @@
-import { Link } from 'react-router-dom';
 import { AlertTriangle, RefreshCw, WifiOff } from 'lucide-react';
 import { useConnection } from '@/hooks/useConnection';
-import { Button } from '../ui/Button';
 
 export function ConnectionBanner() {
   const { browserOnline, apiReachable, degraded, checking, recheck } = useConnection();
@@ -13,7 +11,7 @@ export function ConnectionBanner() {
         className="flex items-center justify-center gap-2 border-b border-line bg-raised px-4 py-2 text-[12.5px] text-muted"
       >
         <WifiOff size={13} aria-hidden="true" />
-        You are offline. Cached content stays readable; actions will fail until you reconnect.
+        You are offline. You can keep reading, but new activity will not load until you reconnect.
       </div>
     );
   }
@@ -26,7 +24,7 @@ export function ConnectionBanner() {
       >
         <span className="flex items-center gap-2">
           <AlertTriangle size={13} aria-hidden="true" />
-          The API is unreachable. Reading is limited to what is already cached.
+          We can&apos;t reach Buzz and Bugs right now. Some content may be out of date.
         </span>
         <button
           type="button"
@@ -34,7 +32,7 @@ export function ConnectionBanner() {
           className="focus-ring inline-flex items-center gap-1 rounded underline decoration-current/40 underline-offset-2 hover:decoration-current"
         >
           <RefreshCw size={11} className={checking ? 'animate-spin' : undefined} aria-hidden="true" />
-          Retry
+          Try again
         </button>
       </div>
     );
@@ -47,35 +45,10 @@ export function ConnectionBanner() {
         className="flex items-center justify-center gap-2 border-b border-amber-500/25 bg-amber-500/10 px-4 py-2 text-[12.5px] text-amber-700 dark:text-amber-300"
       >
         <AlertTriangle size={13} aria-hidden="true" />
-        The API is up but its database is unhealthy. Some requests will fail.
+        Some parts of Buzz and Bugs are temporarily unavailable. Reading still works.
       </div>
     );
   }
 
   return null;
-}
-
-export function BackendNotice() {
-  return (
-    <div className="rounded-lg border border-line bg-raised px-4 py-3 text-[12.5px] leading-relaxed text-muted">
-      <p className="font-medium text-ink">Can&apos;t reach the API</p>
-      <p className="mt-1">
-        Start the backend with <code className="font-mono text-[11.5px]">npm run dev</code> in the
-        backend folder, then check{' '}
-        <Link to="/buzz" className="text-accent underline underline-offset-2">
-          Buzz
-        </Link>{' '}
-        again. The expected base URL is set by{' '}
-        <code className="font-mono text-[11.5px]">VITE_API_BASE_URL</code>.
-      </p>
-    </div>
-  );
-}
-
-export function RetryButton({ onClick, loading }: { onClick: () => void; loading?: boolean }) {
-  return (
-    <Button variant="secondary" size="sm" onClick={onClick} iconLeft={<RefreshCw size={13} />}>
-      {loading ? 'Retrying…' : 'Try again'}
-    </Button>
-  );
 }

@@ -67,7 +67,7 @@ export function EventsSectionPage() {
           title={offline ? 'This category could not load' : 'This category could not be fetched'}
           description={
             offline
-              ? 'The API is not reachable. Start the backend and try again.'
+              ? 'Check your connection and try again.'
               : 'The request failed. Try again in a moment.'
           }
           onRetry={() => void items.refetch()}
@@ -79,7 +79,7 @@ export function EventsSectionPage() {
         <EmptyState
           icon={<CalendarDays size={22} />}
           title="No events in this category"
-          description="Nothing upcoming is cached. The worker refreshes this category on a schedule."
+          description="Upcoming events in this category will be listed here as they are announced."
         />
       ) : null}
 

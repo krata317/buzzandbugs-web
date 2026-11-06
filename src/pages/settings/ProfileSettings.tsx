@@ -127,7 +127,7 @@ export function ProfileSettings() {
     <div className="space-y-4">
       <SettingsCard
         title="Profile picture"
-        description="JPEG, PNG or WebP, up to 2 MB. Images are re-encoded and metadata is stripped by the backend."
+        description="JPEG, PNG or WebP, up to 2 MB. Images are re-encoded and stripped of metadata for privacy."
       >
         <div className="flex flex-wrap items-center gap-4">
           <Avatar src={avatarSrc} name={displayName || 'You'} size="xl" ring />

@@ -54,7 +54,7 @@ export function ReportDialog({ postId, open, onClose }: ReportDialogProps) {
           toast.push({
             title: 'Report received',
             description:
-              'Moderators review reports. The post stays visible until a decision is made.',
+              'If the post breaks the rules it will be hidden while the author can appeal.',
             tone: 'success',
           });
           onClose();
@@ -69,7 +69,7 @@ export function ReportDialog({ postId, open, onClose }: ReportDialogProps) {
       open={open}
       onClose={onClose}
       title="Report this post"
-      description="Reports go to moderators. You can only report a post once."
+      description="Reports are checked against the community rules. If the post breaks them, it is hidden while the author can appeal."
       footer={
         <>
           <Button variant="ghost" onClick={onClose}>

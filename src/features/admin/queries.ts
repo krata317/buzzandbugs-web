@@ -108,3 +108,14 @@ export function useAdminAudit(action: string) {
     }) => (last.hasMore ? last.nextCursor : undefined),
   });
 }
+
+export function useClearAuditLogs() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => adminApi.clearAuditLogs(),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['admin', 'audit'] });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.adminOverview });
+    },
+  });
+}

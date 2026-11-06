@@ -60,7 +60,7 @@ export function NotificationSettings() {
     <div className="space-y-4">
       <SettingsCard
         title="Delivery channels"
-        description="In-app notifications appear in the bell menu. Email is only sent when the backend has SMTP configured."
+        description="Choose where each kind of update reaches you. Email is only used for the categories you enable here."
         footer={
           <SaveIndicator
             saving={update.isPending}

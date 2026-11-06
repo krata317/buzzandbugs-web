@@ -20,9 +20,10 @@ export function BuzzPage() {
   return (
     <div className="space-y-5">
       <PageHeader
+        serif
         eyebrow="Community"
         title="Buzz"
-        description="Discussions, questions and things worth sharing. Newest first, with a small boost for people you follow."
+        description="Discussions, questions and things worth sharing — newest first, in the order they were published."
         actions={
           <IconButton
             label="Refresh feed"
@@ -44,7 +45,7 @@ export function BuzzPage() {
           title={isOffline ? 'Buzz could not load' : 'Something went wrong'}
           description={
             isOffline
-              ? 'The API is not reachable. Start the backend and try again — your draft is kept locally.'
+              ? 'Check your connection and try again. Your draft is kept on this device.'
               : 'The feed request failed. Retrying usually fixes it.'
           }
           onRetry={() => void feed.refetch()}

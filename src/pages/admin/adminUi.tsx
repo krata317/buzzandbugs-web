@@ -49,17 +49,97 @@ export function StatCard({
   );
 }
 
+/* ------------------------------------------------------------------ health */
+
+export type HealthState = 'healthy' | 'degraded' | 'unavailable' | 'unknown';
+
+const HEALTH_COPY: Record<HealthState, string> = {
+  healthy: 'Healthy',
+  degraded: 'Degraded',
+  unavailable: 'Unavailable',
+  unknown: 'Unknown',
+};
+
+const HEALTH_STYLE: Record<HealthState, string> = {
+  healthy: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
+  degraded: 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300',
+  unavailable: 'border-danger/30 bg-danger/10 text-danger',
+  unknown: 'border-line bg-raised text-muted',
+};
+
+const HEALTH_DOT: Record<HealthState, string> = {
+  healthy: 'bg-emerald-500',
+  degraded: 'bg-amber-500',
+  unavailable: 'bg-danger',
+  unknown: 'bg-lineStrong',
+};
+
+export function HealthPill({ state }: { state: HealthState }) {
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5',
+        'font-mono text-[9.5px] uppercase tracking-[0.1em]',
+        HEALTH_STYLE[state],
+      )}
+    >
+      <span className={cn('h-1.5 w-1.5 rounded-full', HEALTH_DOT[state])} aria-hidden="true" />
+      {HEALTH_COPY[state]}
+    </span>
+  );
+}
+
+/**
+ * One card shape for every health indicator, so API, database, worker and moderation can be
+ * compared at a glance instead of each having its own layout.
+ */
+export function HealthCard({
+  label,
+  state,
+  primary,
+  details,
+}: {
+  label: string;
+  state: HealthState;
+  primary: ReactNode;
+  details?: Array<{ label: string; value: ReactNode }>;
+}) {
+  return (
+    <section className="flex h-full flex-col rounded-lg border border-line bg-surface p-4">
+      <div className="flex items-center justify-between gap-2">
+        <p className="font-mono text-[9.5px] uppercase tracking-[0.1em] text-subtle">{label}</p>
+        <HealthPill state={state} />
+      </div>
+
+      <div className="mt-2.5 text-[13.5px] font-medium leading-snug text-ink">{primary}</div>
+
+      {details && details.length > 0 ? (
+        <dl className="mt-auto space-y-1 pt-3">
+          {details.map((detail) => (
+            <div key={detail.label} className="flex items-baseline justify-between gap-3">
+              <dt className="font-mono text-[9.5px] uppercase tracking-[0.08em] text-subtle">
+                {detail.label}
+              </dt>
+              <dd className="truncate font-mono text-[10.5px] text-muted">{detail.value}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
+    </section>
+  );
+}
+
 export function StatusDot({ status }: { status: string }) {
-  const tone =
+  const state: HealthState =
     status === 'up' || status === 'ok' || status === 'healthy'
-      ? 'bg-emerald-500'
+      ? 'healthy'
       : status === 'down' || status === 'failed'
-        ? 'bg-danger'
-        : 'bg-amber-500';
+        ? 'unavailable'
+        : 'unknown';
 
   return (
     <span className="inline-flex items-center gap-1.5 font-mono text-[10.5px] uppercase tracking-[0.08em] text-muted">
-      <span className={cn('h-1.5 w-1.5 rounded-full', tone)} aria-hidden="true" />
+      <span className={cn('h-1.5 w-1.5 rounded-full', HEALTH_DOT[state])} aria-hidden="true" />
       {status}
     </span>
   );

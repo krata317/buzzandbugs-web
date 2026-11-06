@@ -27,7 +27,12 @@ export function AdminSourcesPage() {
     );
   }
 
-  const groups = ['NEWS', 'EVENT', 'TRENDING'] as const;
+  const groups = [
+    { kind: 'NEWS', label: 'News' },
+    { kind: 'EVENT', label: 'Events' },
+    { kind: 'TRENDING', label: 'Trending' },
+    { kind: 'PODCAST', label: 'Podcasts' },
+  ] as const;
 
   return (
     <div>
@@ -46,14 +51,14 @@ export function AdminSourcesPage() {
         }
       />
 
-      {groups.map((kind) => {
-        const rows = sources.data.filter((source) => source.kind === kind);
+      {groups.map((group) => {
+        const rows = sources.data.filter((source) => source.kind === group.kind);
         if (rows.length === 0) return null;
 
         return (
-          <section key={kind} className="mb-6">
+          <section key={group.kind} className="mb-6">
             <h2 className="mb-2 font-mono text-[10px] uppercase tracking-[0.1em] text-subtle">
-              {kind}
+              {group.label}
             </h2>
             <AdminTable>
               <thead>

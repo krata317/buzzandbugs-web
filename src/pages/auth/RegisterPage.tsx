@@ -316,6 +316,18 @@ export function RegisterPage() {
           <Button type="submit" variant="primary" size="lg" fullWidth loading={busy}>
             Create account
           </Button>
+
+          <p className="text-center text-[11.5px] leading-relaxed text-subtle">
+            By creating an account you agree to our{' '}
+            <Link to="/terms" className="text-muted underline underline-offset-2 hover:text-ink">
+              Terms of Service
+            </Link>{' '}
+            and{' '}
+            <Link to="/privacy" className="text-muted underline underline-offset-2 hover:text-ink">
+              Privacy Policy
+            </Link>
+            .
+          </p>
         </form>
       ) : null}
     </AuthShell>

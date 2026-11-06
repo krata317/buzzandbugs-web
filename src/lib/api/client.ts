@@ -42,9 +42,9 @@ export class ApiError extends Error {
   }
 }
 
-/** The request never reached the backend, or the connection dropped. */
+/** The request never reached the server, or the connection dropped. */
 export class NetworkError extends Error {
-  constructor(message = 'The API could not be reached. Check that the backend is running.') {
+  constructor(message = 'We could not reach Buzz and Bugs. Check your connection and try again.') {
     super(message);
     this.name = 'NetworkError';
   }
@@ -139,7 +139,7 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
   } catch (error) {
     if (options.signal?.aborted) throw error;
     if (timedOut) {
-      throw new NetworkError('The request timed out. The API may be busy or unreachable.');
+      throw new NetworkError('That took too long. Check your connection and try again.');
     }
     throw new NetworkError();
   } finally {

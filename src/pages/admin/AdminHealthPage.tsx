@@ -1,7 +1,7 @@
-import { Activity, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { useAdminHealth } from '@/features/admin/queries';
 import { errorMessage } from '@/lib/api';
-import { AdminHeader, StatCard, StatusDot } from './adminUi';
+import { AdminHeader, HealthCard, HealthPill, type HealthState } from './adminUi';
 import { ErrorState, LoadingBlock } from '@/components/ui/feedback';
 import { Button } from '@/components/ui/Button';
 
@@ -32,22 +32,40 @@ export function AdminHealthPage() {
         ? `${Math.floor(uptime / 3600)}h ${Math.floor((uptime % 3600) / 60)}m`
         : `${Math.floor(uptime / 60)}m`;
 
+  const apiState: HealthState = data.api.status === 'up' ? 'healthy' : 'unavailable';
+  const databaseState: HealthState = data.database.status === 'up' ? 'healthy' : 'unavailable';
+  // Background refreshes stop without a worker, but reading and posting still work.
+  const workerState: HealthState =
+    data.worker.status === 'up'
+      ? 'healthy'
+      : data.worker.lastSeenSecondsAgo === null
+        ? 'unknown'
+        : 'degraded';
+  const moderationState: HealthState = data.moderation.configured ? 'healthy' : 'unknown';
+
   const integrations = [
-    { label: 'Content moderation', ready: data.moderation.configured, detail: data.moderation.provider },
-    { label: 'YouTube trending', ready: data.youtube.configured, detail: 'YOUTUBE_API_KEY' },
+    {
+      label: 'YouTube trending',
+      state: (data.youtube.configured ? 'healthy' : 'unknown') as HealthState,
+      detail: data.youtube.configured ? 'configured' : 'not configured',
+    },
     {
       label: 'Email delivery',
-      ready: data.email.smtpConfigured,
-      detail: data.email.transport === 'json' ? 'json transport (no delivery)' : 'smtp',
+      state: (data.email.smtpConfigured ? 'healthy' : 'degraded') as HealthState,
+      detail: data.email.transport === 'json' ? 'recorded, not delivered' : 'smtp',
     },
-    { label: 'Link previews', ready: data.linkPreview.configured, detail: 'linkpreview.net' },
+    {
+      label: 'Link previews',
+      state: (data.linkPreview.configured ? 'healthy' : 'unknown') as HealthState,
+      detail: data.linkPreview.configured ? 'configured' : 'not configured',
+    },
   ];
 
   return (
     <div>
       <AdminHeader
         title="Health"
-        description="Live dependency checks. The API answers this request even when the database is down."
+        description="Live dependency checks. This page answers even when the database is down."
         actions={
           <Button
             variant="secondary"
@@ -60,41 +78,54 @@ export function AdminHealthPage() {
         }
       />
 
-      <div className="grid gap-3 sm:grid-cols-3">
-        <div className="rounded-lg border border-line bg-surface p-4">
-          <p className="font-mono text-[9.5px] uppercase tracking-[0.1em] text-subtle">API</p>
-          <div className="mt-1.5 flex items-baseline gap-2">
-            <span className="font-mono text-[18px] leading-none text-ink">
-              {data.api.status}
-            </span>
-            <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-subtle">
-              {data.api.environment}
-            </span>
-          </div>
-          <p className="mt-1.5 font-mono text-[10.5px] text-subtle">uptime {uptimeLabel}</p>
-        </div>
-
-        <div className="rounded-lg border border-line bg-surface p-4">
-          <p className="font-mono text-[9.5px] uppercase tracking-[0.1em] text-subtle">Database</p>
-          <div className="mt-1.5">
-            <StatusDot status={data.database.status} />
-          </div>
-          <p className="mt-1.5 font-mono text-[10.5px] text-subtle">
-            {data.database.latencyMs !== null ? `${data.database.latencyMs} ms round trip` : 'no latency'}
-          </p>
-        </div>
-
-        <div className="rounded-lg border border-line bg-surface p-4">
-          <p className="font-mono text-[9.5px] uppercase tracking-[0.1em] text-subtle">Worker</p>
-          <div className="mt-1.5">
-            <StatusDot status={data.worker.status} />
-          </div>
-          <p className="mt-1.5 font-mono text-[10.5px] text-subtle">
-            {data.worker.lastSeenSecondsAgo !== null
-              ? `heartbeat ${data.worker.lastSeenSecondsAgo}s ago`
-              : 'no heartbeat recorded'}
-          </p>
-        </div>
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <HealthCard
+          label="API"
+          state={apiState}
+          primary={data.api.environment}
+          details={[{ label: 'Uptime', value: uptimeLabel }]}
+        />
+        <HealthCard
+          label="Database"
+          state={databaseState}
+          primary={data.database.status === 'up' ? 'Accepting queries' : 'Not reachable'}
+          details={[
+            {
+              label: 'Latency',
+              value: data.database.latencyMs !== null ? `${data.database.latencyMs} ms` : '—',
+            },
+          ]}
+        />
+        <HealthCard
+          label="Worker"
+          state={workerState}
+          primary={
+            data.worker.status === 'up'
+              ? 'Refreshing content'
+              : data.worker.lastSeenSecondsAgo === null
+                ? 'Never seen'
+                : 'Not running'
+          }
+          details={[
+            {
+              label: 'Heartbeat',
+              value:
+                data.worker.lastSeenSecondsAgo !== null
+                  ? `${data.worker.lastSeenSecondsAgo}s ago`
+                  : '—',
+            },
+            { label: 'Worker id', value: data.worker.workerId ?? '—' },
+          ]}
+        />
+        <HealthCard
+          label="Content moderation"
+          state={moderationState}
+          primary={data.moderation.configured ? 'Checks enabled' : 'Checks disabled'}
+          details={[
+            { label: 'Provider', value: data.moderation.provider },
+            { label: 'Behaviour', value: data.moderation.configured ? 'enforced' : 'report-only' },
+          ]}
+        />
       </div>
 
       <h2 className="mb-2 mt-6 font-mono text-[10px] uppercase tracking-[0.1em] text-subtle">
@@ -113,42 +144,15 @@ export function AdminHealthPage() {
                 {integration.detail}
               </p>
             </div>
-            <span
-              className={
-                integration.ready
-                  ? 'inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.08em] text-emerald-600 dark:text-emerald-400'
-                  : 'inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.08em] text-subtle'
-              }
-            >
-              <Activity size={11} aria-hidden="true" />
-              {integration.ready ? 'configured' : 'not configured'}
-            </span>
+            <HealthPill state={integration.state} />
           </li>
         ))}
       </ul>
 
-      <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
-        <StatCard
-          label="Moderation"
-          value={data.moderation.configured ? 'on' : 'off'}
-          hint={
-            data.moderation.configured
-              ? 'Report triage and edit checks are available.'
-              : 'Edits are refused with 503 and reports stay in PROVIDER_FAILED.'
-          }
-          tone={data.moderation.configured ? 'default' : 'warning'}
-        />
-        <StatCard
-          label="Worker"
-          value={data.worker.status}
-          hint={
-            data.worker.status === 'up'
-              ? 'Scheduled refreshes and queued email are running.'
-              : 'Start it with npm run dev:worker in the backend.'
-          }
-          tone={data.worker.status === 'up' ? 'default' : 'warning'}
-        />
-      </div>
+      <p className="mt-4 text-[11.5px] leading-relaxed text-subtle">
+        A degraded worker means scheduled refreshes are paused: reading and posting keep working,
+        but news, trending and podcast listings will not update.
+      </p>
     </div>
   );
 }

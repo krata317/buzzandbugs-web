@@ -1,18 +1,24 @@
 import { useState } from 'react';
-import { useAdminAudit } from '@/features/admin/queries';
+import { Trash2 } from 'lucide-react';
+import { useAdminAudit, useClearAuditLogs } from '@/features/admin/queries';
 import { errorMessage } from '@/lib/api';
 import { formatDateTime } from '@/lib/format';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { AdminHeader } from './adminUi';
-import { EmptyState, ErrorState, LoadingBlock } from '@/components/ui/feedback';
+import { Badge, EmptyState, ErrorState, LoadingBlock } from '@/components/ui/feedback';
 import { Input } from '@/components/ui/form';
 import { LoadMore } from '@/components/ui/nav';
-import { Badge } from '@/components/ui/feedback';
+import { Button } from '@/components/ui/Button';
+import { Modal } from '@/components/ui/overlay';
+import { useToast } from '@/providers/ToastProvider';
 
 export function AdminAuditPage() {
   const [action, setAction] = useState('');
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const debounced = useDebouncedValue(action.trim(), 400);
   const logs = useAdminAudit(debounced);
+  const clear = useClearAuditLogs();
+  const toast = useToast();
 
   const items = logs.data?.pages.flatMap((page) => page.items) ?? [];
 
@@ -21,6 +27,16 @@ export function AdminAuditPage() {
       <AdminHeader
         title="Audit log"
         description="Every admin and system action that changes state, newest first."
+        actions={
+          <Button
+            variant="danger"
+            size="sm"
+            iconLeft={<Trash2 size={13} />}
+            onClick={() => setConfirmOpen(true)}
+          >
+            Clear log
+          </Button>
+        }
       />
 
       <div className="mb-4 max-w-sm">
@@ -95,6 +111,48 @@ export function AdminAuditPage() {
           />
         </div>
       ) : null}
+
+      <Modal
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        title="Clear the audit log?"
+        description="Every entry is deleted from the database. The clear operation itself is recorded, so the log is never left without a trace."
+        size="sm"
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setConfirmOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              loading={clear.isPending}
+              onClick={() =>
+                clear.mutate(undefined, {
+                  onSuccess: (result) => {
+                    setConfirmOpen(false);
+                    toast.push({
+                      title: `${result.deleted} entr${result.deleted === 1 ? 'y' : 'ies'} deleted`,
+                      tone: 'success',
+                    });
+                  },
+                  onError: (error) =>
+                    toast.push({
+                      title: 'Could not clear the audit log',
+                      description: errorMessage(error),
+                      tone: 'error',
+                    }),
+                })
+              }
+            >
+              Delete all entries
+            </Button>
+          </>
+        }
+      >
+        <p className="text-[13px] leading-relaxed text-muted">
+          This cannot be undone. Export anything you need before continuing.
+        </p>
+      </Modal>
     </div>
   );
 }

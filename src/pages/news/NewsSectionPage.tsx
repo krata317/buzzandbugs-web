@@ -41,7 +41,6 @@ export function NewsSectionPage() {
 
   const all = items.data?.pages.flatMap((page) => page.items) ?? [];
   const offline = items.isError && isNetworkError(items.error);
-  const [lead, ...rest] = all;
 
   return (
     <div className="space-y-5">
@@ -69,7 +68,7 @@ export function NewsSectionPage() {
           title={offline ? 'This section could not load' : 'This section could not be fetched'}
           description={
             offline
-              ? 'The API is not reachable. Start the backend and try again.'
+              ? 'The connection was interrupted. Check your network and try again.'
               : 'The request failed. Try again in a moment.'
           }
           onRetry={() => void items.refetch()}
@@ -80,19 +79,20 @@ export function NewsSectionPage() {
       {items.data && all.length === 0 ? (
         <EmptyState
           icon={<Newspaper size={22} />}
-          title="Nothing cached for this section"
-          description="The worker refreshes this section on a schedule. If it stays empty, the upstream feed may be unavailable."
+          title="No stories in this section yet"
+          description="New reporting will appear here as it is published."
         />
       ) : null}
 
-      {lead ? (
-        <div>
-          <NewsLeadCard item={lead} />
-          <div className="mt-1 divide-y divide-line">
-            {rest.map((item) => (
+      {all.length > 0 ? (
+        <div className="space-y-2">
+          {all.map((item) =>
+            item.imageUrl ? (
+              <NewsLeadCard key={item.id} item={item} />
+            ) : (
               <NewsRow key={item.id} item={item} />
-            ))}
-          </div>
+            ),
+          )}
         </div>
       ) : null}
 
@@ -100,7 +100,7 @@ export function NewsSectionPage() {
         <LoadMore
           onClick={() => void items.fetchNextPage()}
           loading={items.isFetchingNextPage}
-          label="Show more"
+          label="Load more stories"
         />
       ) : null}
     </div>

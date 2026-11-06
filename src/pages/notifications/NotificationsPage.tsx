@@ -66,7 +66,7 @@ export function NotificationsPage() {
       <PageHeader
         eyebrow="Inbox"
         title="Notifications"
-        description="Mentions, replies, follows and moderation updates. Notifications expire after seven days."
+        description="Mentions, replies, follows and moderation updates. Notifications expire after 14 days."
         actions={
           <Button
             variant="secondary"

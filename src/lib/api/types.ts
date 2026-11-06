@@ -180,7 +180,6 @@ export interface ExternalItem {
 
 export interface ExternalSection {
   section: string;
-  seed: string;
   total: number;
   hasMore: boolean;
   items: ExternalItem[];
@@ -204,13 +203,8 @@ export type DisplayMode = 'light' | 'dark' | 'system';
 export type AccentColor = 'violet' | 'blue' | 'green' | 'amber' | 'rose' | 'teal' | 'slate';
 export type NewsSection = 'trending' | 'ai' | 'security' | 'leaders' | 'india';
 export type EventSection = 'hackathons' | 'contests' | 'ctf';
-export type TrendingSection =
-  | 'youtube'
-  | 'repositories'
-  | 'models'
-  | 'datasets'
-  | 'papers'
-  | 'podcasts';
+export type TrendingSection = 'youtube' | 'repositories' | 'models' | 'datasets' | 'papers';
+export type PodcastSection = 'changelog' | 'freecodecamp' | 'sedaily' | 'infoq' | 'syntax';
 
 export interface ChannelPrefs {
   onPlatform: boolean;
@@ -317,9 +311,8 @@ export interface AdminOverview {
   posts: number;
   postsLast24Hours: number;
   replies: number;
-  reports: number;
-  openCases: number;
-  awaitingAppeal: number;
+  reportsReviewed: number;
+  openAppeals: number;
   bannedUsers: number;
   pendingDeletions: number;
 }
@@ -376,13 +369,16 @@ export interface AdminCase {
   appealMessage: string | null;
   reportCount: number;
   providerCategories: unknown;
+  /** Snapshot of the title, kept after the post is removed. */
+  postTitle: string | null;
+  /** Null once the post has been permanently removed. */
   post: {
     id: string;
     title: string;
     excerpt: string;
     visibility: string;
     author: { id: string; username: string; displayName: string; email: string } | null;
-  };
+  } | null;
 }
 
 export interface AdminSource {

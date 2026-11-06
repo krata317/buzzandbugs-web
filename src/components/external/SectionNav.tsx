@@ -1,9 +1,9 @@
 import { Link, useLocation } from 'react-router-dom';
-import { sectionLabel } from '@/lib/sections';
+import { sectionLabel, type SectionKind } from '@/lib/sections';
 import { cn } from '@/lib/cn';
 
 interface SectionNavProps {
-  kind: 'news' | 'trending' | 'events';
+  kind: SectionKind;
   basePath: string;
   sections: readonly string[];
 }

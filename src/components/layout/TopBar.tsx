@@ -1,6 +1,12 @@
-import { Link } from 'react-router-dom';
-import { Bell, CalendarDays, MessageSquare, Newspaper, Settings, TrendingUp, User } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
+import {
+  Bell,
+  CalendarDays,
+  MessageSquare,
+  Mic,
+  Newspaper,
+  TrendingUp,
+} from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useAuth } from '@/providers/AuthProvider';
 import { useUnreadCount } from '@/features/notifications/queries';
@@ -53,12 +59,11 @@ const TABS = [
   { to: '/buzz', label: 'Buzz', icon: MessageSquare },
   { to: '/news', label: 'News', icon: Newspaper },
   { to: '/trending', label: 'Trending', icon: TrendingUp },
+  { to: '/podcasts', label: 'Podcasts', icon: Mic },
   { to: '/events', label: 'Events', icon: CalendarDays },
 ] as const;
 
 export function MobileTabBar() {
-  const { user } = useAuth();
-
   return (
     <nav
       aria-label="Primary"
@@ -73,7 +78,7 @@ export function MobileTabBar() {
               to={tab.to}
               className={({ isActive }) =>
                 cn(
-                  'flex flex-col items-center gap-1 py-2.5 text-[10.5px] font-medium transition-colors',
+                  'flex flex-col items-center gap-1 py-2.5 text-[10px] font-medium transition-colors',
                   isActive ? 'text-accent' : 'text-muted',
                 )
               }
@@ -87,40 +92,7 @@ export function MobileTabBar() {
             </NavLink>
           );
         })}
-        <NavLink
-          to={user ? `/users/${user.username}` : '/login'}
-          className={({ isActive }) =>
-            cn(
-              'flex flex-col items-center gap-1 py-2.5 text-[10.5px] font-medium transition-colors',
-              isActive ? 'text-accent' : 'text-muted',
-            )
-          }
-        >
-          {({ isActive }) => (
-            <>
-              {user ? (
-                <Avatar src={user.avatarUrl} name={user.displayName} size="xs" />
-              ) : (
-                <User size={19} strokeWidth={isActive ? 2.2 : 1.8} aria-hidden="true" />
-              )}
-              {user ? 'You' : 'Sign in'}
-            </>
-          )}
-        </NavLink>
       </div>
     </nav>
-  );
-}
-
-export function MobileUtilityLinks() {
-  return (
-    <div className="mt-2 space-y-0.5 border-t border-line pt-2">
-      <NavLink to="/notifications" className="nav-link">
-        <Bell size={16} className="text-subtle" /> Notifications
-      </NavLink>
-      <NavLink to="/settings" className="nav-link">
-        <Settings size={16} className="text-subtle" /> Settings
-      </NavLink>
-    </div>
   );
 }

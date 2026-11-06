@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
-import { ArrowUpRight, CalendarDays, Github, Star } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useSections } from '@/features/external/queries';
 import { usePost } from '@/features/posts/queries';
@@ -8,30 +8,29 @@ import { useProfile } from '@/features/users/queries';
 import { Avatar } from '@/components/ui/Avatar';
 import { FollowButton } from '@/components/users/FollowButton';
 import { Skeleton } from '@/components/ui/feedback';
+import { SectionJumpNav } from '@/components/external/SectionJumpNav';
+import { NewsCompactRow } from '@/components/external/NewsCard';
 import {
   EVENT_SECTIONS,
   NEWS_SECTIONS,
+  PODCAST_SECTIONS,
   TRENDING_SECTIONS,
-  numberMeta,
   platformLabel,
-  sectionLabel,
+  type SectionKind,
 } from '@/lib/sections';
 import { formatCount, formatDayNumber, formatMonth, formatTime } from '@/lib/format';
-import type { ExternalItem } from '@/lib/api/types';
 
 function RailCard({
   title,
   action,
   children,
-  className,
 }: {
   title: string;
   action?: ReactNode;
   children: ReactNode;
-  className?: string;
 }) {
   return (
-    <section className={cn('rounded-xl border border-line bg-surface p-4', className)}>
+    <section className="rounded-xl border border-line bg-surface p-4">
       <div className="mb-3 flex items-center justify-between gap-2">
         <h2 className="text-[12px] font-semibold uppercase tracking-[0.1em] text-muted">{title}</h2>
         {action}
@@ -41,136 +40,76 @@ function RailCard({
   );
 }
 
-function RailLink({ to, children }: { to: string; children: ReactNode }) {
+function ViewMore({ to, label }: { to: string; label: string }) {
   return (
     <Link
       to={to}
-      className="focus-ring flex items-baseline justify-between gap-3 rounded-md py-1.5 text-[13px] text-muted transition-colors hover:text-ink"
+      className="focus-ring inline-flex items-center gap-1 text-2xs uppercase tracking-[0.1em] text-subtle transition-colors hover:text-accent"
     >
-      {children}
+      {label}
+      <ArrowRight size={10} aria-hidden="true" />
     </Link>
   );
 }
 
-function RepositoryRail() {
-  const query = useSections('trending');
-  const repositories = query.data?.find((section) => section.section === 'repositories');
+function SectionRail({
+  kind,
+  basePath,
+  sections,
+}: {
+  kind: SectionKind;
+  basePath: string;
+  sections: readonly string[];
+}) {
+  return (
+    <RailCard title="Sections">
+      <SectionJumpNav kind={kind} basePath={basePath} sections={sections} />
+    </RailCard>
+  );
+}
 
-  if (query.isLoading) {
+function LatestNewsRail() {
+  const news = useSections('news');
+  const items = news.data?.flatMap((section) => section.items).slice(0, 3) ?? [];
+
+  if (news.isLoading) {
     return (
-      <RailCard title="Trending repositories">
+      <RailCard title="Latest news">
         <div className="space-y-2.5">
-          {[0, 1, 2, 3].map((index) => (
-            <Skeleton key={index} className="h-3.5 w-full" />
+          {[0, 1, 2].map((index) => (
+            <Skeleton key={index} className="h-9 w-full" />
           ))}
         </div>
       </RailCard>
     );
   }
 
-  if (!repositories || repositories.items.length === 0) return null;
+  if (items.length === 0) {
+    return (
+      <RailCard title="Latest news">
+        <p className="text-[12.5px] leading-relaxed text-muted">
+          Today&apos;s technology reporting will appear here as it is published.
+        </p>
+      </RailCard>
+    );
+  }
 
   return (
-    <RailCard
-      title="Trending repositories"
-      action={
-        <Link
-          to="/trending/repositories"
-          className="focus-ring text-2xs uppercase tracking-[0.1em] text-subtle transition-colors hover:text-accent"
-        >
-          All
-        </Link>
-      }
-    >
-      <ul className="space-y-0.5">
-        {repositories.items.slice(0, 5).map((item) => {
-          const stars = numberMeta(item.metadata, 'stars');
-          const owner = typeof item.metadata?.owner === 'string' ? item.metadata.owner : null;
-          const name = typeof item.metadata?.name === 'string' ? item.metadata.name : item.title;
-          return (
-            <li key={item.id}>
-              <a
-                href={item.url}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="focus-ring group flex items-start gap-2 rounded-md py-1.5 transition-colors"
-              >
-                <Github size={13} className="mt-0.5 shrink-0 text-subtle" aria-hidden="true" />
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[13px] leading-snug text-ink group-hover:text-accent">
-                    {owner ? <span className="text-muted">{owner}/</span> : null}
-                    {name}
-                  </span>
-                  {stars !== null ? (
-                    <span className="mt-0.5 flex items-center gap-1 font-mono text-[10.5px] text-subtle">
-                      <Star size={9} aria-hidden="true" /> {formatCount(stars)}
-                    </span>
-                  ) : null}
-                </span>
-              </a>
-            </li>
-          );
-        })}
-      </ul>
-    </RailCard>
-  );
-}
-
-function AboutBuzzRail() {
-  return (
-    <RailCard title="How Buzz works">
-      <ul className="space-y-2.5 text-[12.5px] leading-relaxed text-muted">
-        <li>Posts publish immediately and are ranked by votes and recency.</li>
-        <li>Reports send a post to moderation. Flagged posts are hidden while the author can appeal.</li>
-        <li>Replies are capped at ten per person on each post.</li>
-      </ul>
-      <p className="mt-3 border-t border-line pt-3 text-[12px] leading-relaxed text-subtle">
-        Your feed is chronological, with a small boost for people you follow.
-      </p>
-    </RailCard>
-  );
-}
-
-function SectionsRail({
-  kind,
-  basePath,
-  sections,
-}: {
-  kind: 'news' | 'trending' | 'events';
-  basePath: string;
-  sections: readonly string[];
-}) {
-  const query = useSections(kind);
-  const totals = new Map(query.data?.map((section) => [section.section, section.total]) ?? []);
-  const { pathname } = useLocation();
-
-  return (
-    <RailCard title="Sections">
-      <div className="space-y-0.5">
-        {sections.map((section) => {
-          const total = totals.get(section);
-          const active = pathname === `${basePath}/${section}`;
-          return (
-            <RailLink key={section} to={`${basePath}/${section}`}>
-              <span className={cn('truncate', active && 'font-medium text-ink')}>
-                {sectionLabel(kind, section)}
-              </span>
-              {typeof total === 'number' ? (
-                <span className="shrink-0 font-mono text-[10.5px] text-subtle">{total}</span>
-              ) : null}
-            </RailLink>
-          );
-        })}
+    <RailCard title="Latest news" action={<ViewMore to="/news" label="View more" />}>
+      <div className="divide-y divide-line">
+        {items.map((item) => (
+          <NewsCompactRow key={item.id} item={item} />
+        ))}
       </div>
     </RailCard>
   );
 }
 
 function UpcomingEventsRail() {
-  const query = useSections('events');
+  const events = useSections('events');
   const now = Date.now();
 
-  const upcoming = (query.data ?? [])
+  const upcoming = (events.data ?? [])
     .flatMap((section) => section.items)
     .filter((item) => {
       const end = item.endsAt ? new Date(item.endsAt).getTime() : null;
@@ -181,9 +120,9 @@ function UpcomingEventsRail() {
       const bStart = b.startsAt ? new Date(b.startsAt).getTime() : Number.MAX_SAFE_INTEGER;
       return aStart - bStart;
     })
-    .slice(0, 4);
+    .slice(0, 3);
 
-  if (query.isLoading) {
+  if (events.isLoading) {
     return (
       <RailCard title="Coming up">
         <div className="space-y-2.5">
@@ -195,20 +134,18 @@ function UpcomingEventsRail() {
     );
   }
 
-  if (upcoming.length === 0) return null;
+  if (upcoming.length === 0) {
+    return (
+      <RailCard title="Coming up">
+        <p className="text-[12.5px] leading-relaxed text-muted">
+          Hackathons, contests and CTF competitions will be listed here as they are announced.
+        </p>
+      </RailCard>
+    );
+  }
 
   return (
-    <RailCard
-      title="Coming up"
-      action={
-        <Link
-          to="/events"
-          className="focus-ring text-2xs uppercase tracking-[0.1em] text-subtle transition-colors hover:text-accent"
-        >
-          All
-        </Link>
-      }
-    >
+    <RailCard title="Coming up" action={<ViewMore to="/events" label="View more" />}>
       <ul className="space-y-2">
         {upcoming.map((item) => (
           <li key={item.id}>
@@ -271,9 +208,7 @@ function AuthorRail({ postId }: { postId: string }) {
       ) : null}
       <div className="mt-3 flex items-center justify-between gap-3 border-t border-line pt-3">
         <div className="flex gap-4 font-mono text-[10.5px] uppercase tracking-[0.08em] text-subtle">
-          <span>
-            {formatCount(profile.data?.stats.followers ?? null)} followers
-          </span>
+          <span>{formatCount(profile.data?.stats.followers ?? null)} followers</span>
           <span>{formatCount(profile.data?.stats.posts ?? 0)} posts</span>
         </div>
         {profile.data && !profile.data.viewer.isSelf ? (
@@ -288,25 +223,6 @@ function AuthorRail({ postId }: { postId: string }) {
   );
 }
 
-function ExternalLinkCard({ item }: { item: ExternalItem }) {
-  return (
-    <a
-      href={item.url}
-      target="_blank"
-      rel="noreferrer noopener"
-      className="focus-ring group flex items-start gap-2 rounded-md py-1.5"
-    >
-      <CalendarDays size={13} className="mt-0.5 shrink-0 text-subtle" aria-hidden="true" />
-      <span className="min-w-0 flex-1">
-        <span className="line-clamp-2 text-[12.5px] leading-snug text-ink group-hover:text-accent">
-          {item.title}
-        </span>
-      </span>
-      <ArrowUpRight size={12} className="mt-0.5 shrink-0 text-subtle" aria-hidden="true" />
-    </a>
-  );
-}
-
 export function RightRail() {
   const { pathname } = useLocation();
   const params = useParams();
@@ -318,6 +234,8 @@ export function RightRail() {
     pathname.startsWith('/register') ||
     pathname.startsWith('/forgot-password') ||
     pathname.startsWith('/appeals') ||
+    pathname.startsWith('/terms') ||
+    pathname.startsWith('/privacy') ||
     pathname.startsWith('/admin')
   ) {
     return null;
@@ -328,19 +246,21 @@ export function RightRail() {
   if (pathname === '/buzz' || pathname === '/') {
     content = (
       <>
-        <RepositoryRail />
-        <AboutBuzzRail />
+        <LatestNewsRail />
+        <UpcomingEventsRail />
       </>
     );
   } else if (pathname.startsWith('/news')) {
-    content = <SectionsRail kind="news" basePath="/news" sections={NEWS_SECTIONS} />;
+    content = <SectionRail kind="news" basePath="/news" sections={NEWS_SECTIONS} />;
   } else if (pathname.startsWith('/trending')) {
-    content = <SectionsRail kind="trending" basePath="/trending" sections={TRENDING_SECTIONS} />;
+    content = <SectionRail kind="trending" basePath="/trending" sections={TRENDING_SECTIONS} />;
+  } else if (pathname.startsWith('/podcasts')) {
+    content = <SectionRail kind="podcasts" basePath="/podcasts" sections={PODCAST_SECTIONS} />;
   } else if (pathname.startsWith('/events')) {
     content = (
       <>
         <UpcomingEventsRail />
-        <SectionsRail kind="events" basePath="/events" sections={EVENT_SECTIONS} />
+        <SectionRail kind="events" basePath="/events" sections={EVENT_SECTIONS} />
       </>
     );
   } else if (pathname.startsWith('/posts/') && params.id) {
@@ -350,10 +270,12 @@ export function RightRail() {
   if (!content) return null;
 
   return (
-    <aside className="sticky top-0 hidden h-screen w-[316px] shrink-0 overflow-y-auto border-l border-line px-5 py-6 xl:block">
+    <aside
+      className={cn(
+        'sticky top-0 hidden h-screen w-[316px] shrink-0 overflow-y-auto border-l border-line px-5 py-6 xl:block',
+      )}
+    >
       <div className="space-y-4">{content}</div>
     </aside>
   );
 }
-
-export { ExternalLinkCard };

@@ -71,9 +71,6 @@ export const postsApi = {
 
   report: (id: string, input: { reason: ReportReason; details?: string }) =>
     api
-      .post<ApiEnvelope<{ status: string; caseId: string }>>(
-        `/posts/${encodeURIComponent(id)}/report`,
-        input,
-      )
+      .post<ApiEnvelope<{ status: string }>>(`/posts/${encodeURIComponent(id)}/report`, input)
       .then((response) => response.data),
 };

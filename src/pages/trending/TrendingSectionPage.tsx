@@ -67,7 +67,7 @@ export function TrendingSectionPage() {
           title={offline ? 'This section could not load' : 'This section could not be fetched'}
           description={
             offline
-              ? 'The API is not reachable. Start the backend and try again.'
+              ? 'Check your connection and try again.'
               : 'The request failed. Try again in a moment.'
           }
           onRetry={() => void items.refetch()}
@@ -78,8 +78,8 @@ export function TrendingSectionPage() {
       {items.data && all.length === 0 ? (
         <EmptyState
           icon={<TrendingUp size={22} />}
-          title="Nothing cached for this section"
-          description="The worker refreshes this section on a schedule. YouTube also requires a YOUTUBE_API_KEY on the backend."
+          title="Nothing here yet"
+          description="Popular items in this category will appear here as they gain attention."
         />
       ) : null}
 

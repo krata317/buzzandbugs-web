@@ -58,16 +58,16 @@ export function AdminOverviewPage() {
         <StatCard label="Users" value={data.users} hint={`${data.newUsersLast7Days} new in 7 days`} />
         <StatCard label="Posts" value={data.posts} hint={`${data.postsLast24Hours} in 24 hours`} />
         <StatCard label="Replies" value={data.replies} />
-        <StatCard label="Reports" value={data.reports} />
         <StatCard
-          label="Open cases"
-          value={data.openCases}
-          tone={data.openCases > 0 ? 'warning' : 'default'}
+          label="Reports reviewed"
+          value={data.reportsReviewed}
+          hint="reports attached to an appeal"
         />
         <StatCard
-          label="Awaiting appeal"
-          value={data.awaitingAppeal}
-          tone={data.awaitingAppeal > 0 ? 'warning' : 'default'}
+          label="Open appeals"
+          value={data.openAppeals}
+          hint="waiting on a decision"
+          tone={data.openAppeals > 0 ? 'warning' : 'default'}
         />
         <StatCard label="Banned users" value={data.bannedUsers} />
         <StatCard
@@ -90,8 +90,8 @@ export function AdminOverviewPage() {
               Moderation queue
             </span>
             <span className="mt-0.5 block text-[12px] leading-relaxed text-muted">
-              {data.openCases} open case{data.openCases === 1 ? '' : 's'}, {data.awaitingAppeal}{' '}
-              appeal{data.awaitingAppeal === 1 ? '' : 's'} waiting on a decision.
+              {data.openAppeals} appeal{data.openAppeals === 1 ? '' : 's'} waiting for a decision.
+              Automated checks that were accepted never reach this queue.
             </span>
           </span>
         </Link>

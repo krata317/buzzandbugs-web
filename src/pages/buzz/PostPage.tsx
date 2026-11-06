@@ -32,12 +32,8 @@ import { EditPostDialog } from '@/components/posts/EditPostDialog';
 import type { PostSummary } from '@/lib/api/types';
 
 const MODERATION_COPY: Record<string, string> = {
-  PENDING_PROVIDER: 'This post is waiting for an automated content check.',
-  PROVIDER_FAILED: 'The automated content check could not complete. The post stays visible meanwhile.',
   AWAITING_APPEAL: 'This post was flagged and is hidden from everyone else while you appeal.',
   APPEALED: 'Your appeal is queued for a moderator to review.',
-  RESOLVED_KEPT: 'This post was reviewed and kept.',
-  RESOLVED_REMOVED: 'This post was removed.',
 };
 
 export function PostPage() {
@@ -70,7 +66,7 @@ export function PostPage() {
             notFound
               ? 'It may have been deleted, removed by moderation, or hidden from you.'
               : offline
-                ? 'The API is not reachable. Check that the backend is running.'
+                ? 'Check your connection and try again.'
                 : 'The request failed. Retrying usually fixes it.'
           }
           onRetry={notFound ? undefined : () => void post.refetch()}

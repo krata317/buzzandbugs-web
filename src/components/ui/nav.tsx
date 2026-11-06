@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-import { NavLink } from 'react-router-dom';
 import { cn } from '@/lib/cn';
 import { Spinner } from './feedback';
 import { Button } from './Button';
@@ -42,9 +41,7 @@ export function SegmentedControl<T extends string>({
             onClick={() => onChange(option.value)}
             className={cn(
               'focus-ring inline-flex items-center gap-1.5 rounded-[7px] px-3 py-1.5 text-[13px] font-medium transition-all duration-150',
-              active
-                ? 'bg-surface text-ink shadow-soft'
-                : 'text-muted hover:text-ink',
+              active ? 'bg-surface text-ink shadow-soft' : 'text-muted hover:text-ink',
             )}
           >
             {option.label}
@@ -62,40 +59,6 @@ export function SegmentedControl<T extends string>({
         );
       })}
     </div>
-  );
-}
-
-interface TabLink {
-  to: string;
-  label: string;
-  end?: boolean;
-  count?: number;
-}
-
-export function TabLinks({ items, label }: { items: TabLink[]; label: string }) {
-  return (
-    <nav aria-label={label} className="-mb-px flex gap-1 overflow-x-auto no-scrollbar">
-      {items.map((item) => (
-        <NavLink
-          key={item.to}
-          to={item.to}
-          end={item.end}
-          className={({ isActive }) =>
-            cn(
-              'focus-ring relative whitespace-nowrap border-b-2 px-3 py-2.5 text-[13.5px] font-medium transition-colors',
-              isActive
-                ? 'border-accent text-ink'
-                : 'border-transparent text-muted hover:border-lineStrong hover:text-ink',
-            )
-          }
-        >
-          {item.label}
-          {typeof item.count === 'number' && item.count > 0 ? (
-            <span className="ml-1.5 font-mono text-[11px] text-subtle">{item.count}</span>
-          ) : null}
-        </NavLink>
-      ))}
-    </nav>
   );
 }
 
@@ -157,15 +120,6 @@ export function LoadMore({ onClick, loading, label = 'Load more' }: LoadMoreProp
           label
         )}
       </Button>
-    </div>
-  );
-}
-
-export function SectionRule({ children }: { children: ReactNode }) {
-  return (
-    <div className="flex items-center gap-3">
-      <span className="meta whitespace-nowrap">{children}</span>
-      <span className="h-px flex-1 bg-line" />
     </div>
   );
 }

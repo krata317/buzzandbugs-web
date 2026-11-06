@@ -55,8 +55,8 @@ export function EventsPage() {
           title={offline ? 'Events could not load' : 'Events could not be fetched'}
           description={
             offline
-              ? 'The API is not reachable. Start the backend and try again.'
-              : 'The request failed. Events are cached by the worker, so this is usually temporary.'
+              ? 'The connection was interrupted. Check your network and try again.'
+              : 'The request failed. Try again in a moment.'
           }
           onRetry={() => void events.refetch()}
           offline={offline}
@@ -66,13 +66,18 @@ export function EventsPage() {
       {events.data && sections.length === 0 ? (
         <EmptyState
           icon={<CalendarDays size={22} />}
-          title="No events cached yet"
-          description="The worker pulls hackathons, contests and CTF listings on a schedule. Start it with npm run dev:worker to populate this page."
+          title="No events on the calendar yet"
+          description="Upcoming hackathons, coding contests and Capture the Flag competitions will be listed here."
         />
       ) : null}
 
       {sections.map((section) => (
-        <section key={section.section} aria-labelledby={`events-${section.section}`}>
+        <section
+          key={section.section}
+          id={`section-${section.section}`}
+          className="scroll-mt-24"
+          aria-labelledby={`events-${section.section}`}
+        >
           <div className="mb-3 flex items-baseline justify-between gap-3 border-b border-line pb-2">
             <div>
               <h2
@@ -89,7 +94,7 @@ export function EventsPage() {
               to={`/events/${section.section}`}
               className="focus-ring inline-flex shrink-0 items-center gap-1 text-[11.5px] text-muted transition-colors hover:text-accent"
             >
-              All {section.total}
+              View more
               <ArrowRight size={12} aria-hidden="true" />
             </Link>
           </div>

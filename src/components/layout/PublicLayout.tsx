@@ -11,6 +11,7 @@ const NAV = [
   { to: '/buzz', label: 'Buzz' },
   { to: '/news', label: 'News' },
   { to: '/trending', label: 'Trending' },
+  { to: '/podcasts', label: 'Podcasts' },
   { to: '/events', label: 'Events' },
 ];
 
@@ -78,12 +79,12 @@ function Footer() {
 
   return (
     <footer className="mt-20 border-t border-line">
-      <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.6fr_1fr_1fr] lg:px-8">
+      <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr] lg:px-8">
         <div>
           <Logo />
           <p className="mt-3 max-w-sm text-[13px] leading-relaxed text-muted">
-            A developer community for discussion, curated reading and the events worth blocking
-            your calendar for.
+            A developer community for discussion, curated reading, listening and the events worth
+            blocking your calendar for.
           </p>
         </div>
 
@@ -132,12 +133,34 @@ function Footer() {
             </li>
           </ul>
         </nav>
+
+        <nav aria-label="Legal">
+          <h2 className="meta mb-3">Legal</h2>
+          <ul className="space-y-2">
+            <li>
+              <Link
+                to="/terms"
+                className="focus-ring text-[13px] text-muted transition-colors hover:text-ink"
+              >
+                Terms of Service
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/privacy"
+                className="focus-ring text-[13px] text-muted transition-colors hover:text-ink"
+              >
+                Privacy Policy
+              </Link>
+            </li>
+          </ul>
+        </nav>
       </div>
 
       <div className="border-t border-line">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-4 py-5 text-[12px] text-subtle sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
           <span>© {year} Buzz and Bugs</span>
-          <span>News, events and trending items link to their original publishers.</span>
+          <span>News, events, trending items and podcasts link to their original publishers.</span>
         </div>
       </div>
     </footer>

@@ -111,4 +111,9 @@ export const adminApi = {
         nextCursor: response.meta.nextCursor ?? null,
         hasMore: Boolean(response.meta.hasMore),
       })),
+
+  clearAuditLogs: () =>
+    api
+      .delete<ApiEnvelope<{ deleted: number }>>('/admin/audit-logs', { scope })
+      .then((response) => response.data),
 };

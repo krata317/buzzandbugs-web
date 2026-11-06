@@ -1,4 +1,4 @@
-import type { EventSection, NewsSection, TrendingSection } from './api/types';
+import type { EventSection, NewsSection, PodcastSection, TrendingSection } from './api/types';
 
 export const NEWS_SECTIONS: NewsSection[] = ['trending', 'ai', 'security', 'leaders', 'india'];
 export const EVENT_SECTIONS: EventSection[] = ['hackathons', 'contests', 'ctf'];
@@ -8,7 +8,13 @@ export const TRENDING_SECTIONS: TrendingSection[] = [
   'models',
   'datasets',
   'papers',
-  'podcasts',
+];
+export const PODCAST_SECTIONS: PodcastSection[] = [
+  'changelog',
+  'freecodecamp',
+  'sedaily',
+  'infoq',
+  'syntax',
 ];
 
 export const NEWS_LABELS: Record<NewsSection, string> = {
@@ -45,7 +51,6 @@ export const TRENDING_LABELS: Record<TrendingSection, string> = {
   models: 'Models',
   datasets: 'Datasets',
   papers: 'Research papers',
-  podcasts: 'Podcasts',
 };
 
 export const TRENDING_DESCRIPTIONS: Record<TrendingSection, string> = {
@@ -54,7 +59,22 @@ export const TRENDING_DESCRIPTIONS: Record<TrendingSection, string> = {
   models: 'Trending models on Hugging Face.',
   datasets: 'The most-downloaded datasets on Hugging Face.',
   papers: 'Trending papers tracked by Papers with Code.',
-  podcasts: 'Recent episodes from engineering podcasts.',
+};
+
+export const PODCAST_LABELS: Record<PodcastSection, string> = {
+  changelog: 'The Changelog',
+  freecodecamp: 'freeCodeCamp',
+  sedaily: 'Software Engineering Daily',
+  infoq: 'InfoQ',
+  syntax: 'Syntax',
+};
+
+export const PODCAST_DESCRIPTIONS: Record<PodcastSection, string> = {
+  changelog: 'Conversations with the people building and maintaining open source.',
+  freecodecamp: 'Practical lessons for people learning to build software.',
+  sedaily: 'Interviews about the engineering behind production systems.',
+  infoq: 'Architecture, delivery and engineering practice from InfoQ.',
+  syntax: 'Two developers working through the details of web development.',
 };
 
 const PLATFORM_LABELS: Record<string, string> = {
@@ -80,18 +100,19 @@ export function platformLabel(value: unknown): string | null {
   return PLATFORM_LABELS[value] ?? value;
 }
 
-export function sectionLabel(kind: 'news' | 'trending' | 'events', section: string): string {
+export type SectionKind = 'news' | 'trending' | 'events' | 'podcasts';
+
+export function sectionLabel(kind: SectionKind, section: string): string {
   if (kind === 'news') return NEWS_LABELS[section as NewsSection] ?? section;
   if (kind === 'trending') return TRENDING_LABELS[section as TrendingSection] ?? section;
+  if (kind === 'podcasts') return PODCAST_LABELS[section as PodcastSection] ?? section;
   return EVENT_LABELS[section as EventSection] ?? section;
 }
 
-export function sectionDescription(
-  kind: 'news' | 'trending' | 'events',
-  section: string,
-): string | null {
+export function sectionDescription(kind: SectionKind, section: string): string | null {
   if (kind === 'news') return NEWS_DESCRIPTIONS[section as NewsSection] ?? null;
   if (kind === 'trending') return TRENDING_DESCRIPTIONS[section as TrendingSection] ?? null;
+  if (kind === 'podcasts') return PODCAST_DESCRIPTIONS[section as PodcastSection] ?? null;
   return EVENT_DESCRIPTIONS[section as EventSection] ?? null;
 }
 
@@ -105,6 +126,10 @@ export function isTrendingSection(value: string): value is TrendingSection {
 
 export function isEventSection(value: string): value is EventSection {
   return (EVENT_SECTIONS as string[]).includes(value);
+}
+
+export function isPodcastSection(value: string): value is PodcastSection {
+  return (PODCAST_SECTIONS as string[]).includes(value);
 }
 
 /** Human-readable metadata values coming from the external sources. */

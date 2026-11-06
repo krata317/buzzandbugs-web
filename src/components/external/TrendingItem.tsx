@@ -1,8 +1,8 @@
 import { useState, type ReactNode } from 'react';
-import { ArrowUpRight, Clock3, Download, Heart, Play, Star } from 'lucide-react';
+import { ArrowUpRight, Download, Heart, Play, Star } from 'lucide-react';
 import type { ExternalItem } from '@/lib/api/types';
 import { cn } from '@/lib/cn';
-import { formatCount, formatDate, formatDuration, hostOf, relativeTime } from '@/lib/format';
+import { formatCount, formatDate, hostOf } from '@/lib/format';
 import { numberMeta, stringListMeta, stringMeta } from '@/lib/sections';
 
 function Stat({ icon: Icon, value }: { icon: typeof Star; value: number | null }) {
@@ -176,37 +176,6 @@ function PaperCard({ item }: { item: ExternalItem }) {
   );
 }
 
-function PodcastCard({ item }: { item: ExternalItem }) {
-  const duration = formatDuration(numberMeta(item.metadata, 'durationSeconds'));
-  const publisher = stringMeta(item.metadata, 'publisher') ?? item.author;
-
-  return (
-    <Shell href={item.url}>
-      <div className="flex items-start gap-3">
-        <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-accent/10 text-accent">
-          <Play size={14} aria-hidden="true" />
-        </span>
-        <div className="min-w-0">
-          <p className="truncate font-mono text-[10px] uppercase tracking-[0.1em] text-subtle">
-            {publisher ?? 'Podcast'}
-          </p>
-          <h3 className="mt-0.5 line-clamp-2 text-[13.5px] font-medium leading-snug text-ink transition-colors group-hover:text-accent">
-            {item.title}
-          </h3>
-          <div className="mt-1 flex items-center gap-2 font-mono text-[10.5px] text-subtle">
-            {duration ? (
-              <span className="inline-flex items-center gap-1">
-                <Clock3 size={10} aria-hidden="true" /> {duration}
-              </span>
-            ) : null}
-            {item.publishedAt ? <span>{relativeTime(item.publishedAt)}</span> : null}
-          </div>
-        </div>
-      </div>
-    </Shell>
-  );
-}
-
 function VideoCard({ item }: { item: ExternalItem }) {
   const [failed, setFailed] = useState(false);
   const views = numberMeta(item.metadata, 'views');
@@ -267,8 +236,6 @@ export function TrendingItem({
       return <DatasetCard item={item} />;
     case 'papers':
       return <PaperCard item={item} />;
-    case 'podcasts':
-      return <PodcastCard item={item} />;
     case 'youtube':
       return <VideoCard item={item} />;
     default:

@@ -6,16 +6,19 @@ import {
   ArrowUpRight,
   CalendarDays,
   MessageSquare,
+  Mic,
   Newspaper,
   TrendingUp,
 } from 'lucide-react';
 import { postsApi } from '@/lib/api';
+import type { ExternalItem } from '@/lib/api/types';
 import { useSections } from '@/features/external/queries';
 import { useAuth } from '@/providers/AuthProvider';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { buttonStyles } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/feedback';
-import { hostOf, relativeTime, cleanText } from '@/lib/format';
+import { cleanText, formatCount, formatDate, hostOf, relativeTime } from '@/lib/format';
+import { numberMeta, stringMeta } from '@/lib/sections';
 import { eventStatus } from '@/components/external/EventCard';
 
 function PreviewShell({
@@ -23,14 +26,21 @@ function PreviewShell({
   to,
   icon: Icon,
   children,
+  wide,
 }: {
   title: string;
   to: string;
   icon: typeof MessageSquare;
   children: ReactNode;
+  wide?: boolean;
 }) {
   return (
-    <section className="flex h-full flex-col rounded-xl border border-line bg-surface p-4 transition-[border-color,box-shadow] duration-200 hover:border-lineStrong hover:shadow-soft sm:p-5">
+    <section
+      className={[
+        'flex h-full flex-col rounded-xl border border-line bg-surface p-4 transition-[border-color,box-shadow] duration-200 hover:border-lineStrong hover:shadow-soft sm:p-5',
+        wide ? 'sm:col-span-2' : '',
+      ].join(' ')}
+    >
       <div className="mb-3 flex items-center justify-between">
         <span className="inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.1em] text-muted">
           <Icon size={13} className="text-subtle" aria-hidden="true" />
@@ -47,6 +57,10 @@ function PreviewShell({
       <div className="flex-1">{children}</div>
     </section>
   );
+}
+
+function EmptyPreview({ children }: { children: ReactNode }) {
+  return <p className="text-[12.5px] leading-relaxed text-muted">{children}</p>;
 }
 
 function BuzzPreview() {
@@ -73,11 +87,10 @@ function BuzzPreview() {
 
   if (feed.isError || items.length === 0) {
     return (
-      <p className="text-[12.5px] leading-relaxed text-muted">
-        {feed.isError
-          ? 'The API is not reachable right now.'
-          : 'No posts have been published yet. Yours could be the first.'}
-      </p>
+      <EmptyPreview>
+        Conversations about the work of building software will appear here as the community starts
+        talking.
+      </EmptyPreview>
     );
   }
 
@@ -90,7 +103,8 @@ function BuzzPreview() {
               {post.title}
             </p>
             <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-subtle">
-              {post.author.displayName} · {relativeTime(post.createdAt)} · {post.score} points
+              {post.author.displayName} · {relativeTime(post.createdAt)} · {formatCount(post.score)}{' '}
+              points
             </p>
           </Link>
         </li>
@@ -118,11 +132,10 @@ function NewsPreview() {
 
   if (news.isError || items.length === 0) {
     return (
-      <p className="text-[12.5px] leading-relaxed text-muted">
-        {news.isError
-          ? 'The API is not reachable right now.'
-          : 'No articles are cached yet. The worker fills this from publisher feeds.'}
-      </p>
+      <EmptyPreview>
+        Today&apos;s technology reporting will appear here, with every headline linking to the
+        original publication.
+      </EmptyPreview>
     );
   }
 
@@ -171,18 +184,16 @@ function TrendingPreview() {
 
   if (trending.isError || items.length === 0) {
     return (
-      <p className="text-[12.5px] leading-relaxed text-muted">
-        {trending.isError
-          ? 'The API is not reachable right now.'
-          : 'Nothing cached yet. Trending is refreshed from GitHub, Hugging Face and paper feeds.'}
-      </p>
+      <EmptyPreview>
+        The repositories, models and papers the community is watching will appear here.
+      </EmptyPreview>
     );
   }
 
   return (
     <ul className="space-y-3">
       {items.map((item) => {
-        const stars = typeof item.metadata?.stars === 'number' ? item.metadata.stars : null;
+        const stars = numberMeta(item.metadata, 'stars');
         return (
           <li key={item.id}>
             <a
@@ -195,7 +206,7 @@ function TrendingPreview() {
                 {item.title}
               </p>
               <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-subtle">
-                {stars !== null ? `${stars.toLocaleString('en')} stars` : section?.section}
+                {stars !== null ? `${formatCount(stars)} stars` : 'Trending'}
               </p>
             </a>
           </li>
@@ -236,11 +247,9 @@ function EventsPreview() {
 
   if (events.isError || items.length === 0) {
     return (
-      <p className="text-[12.5px] leading-relaxed text-muted">
-        {events.isError
-          ? 'The API is not reachable right now.'
-          : 'No upcoming events are cached. The worker pulls hackathons, contests and CTFs.'}
-      </p>
+      <EmptyPreview>
+        Upcoming hackathons, coding contests and Capture the Flag competitions will appear here.
+      </EmptyPreview>
     );
   }
 
@@ -259,9 +268,7 @@ function EventsPreview() {
             </p>
             <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-subtle">
               {eventStatus(item) === 'ongoing' ? 'Happening now' : 'Upcoming'}
-              {item.startsAt
-                ? ` · ${new Intl.DateTimeFormat('en', { day: 'numeric', month: 'short' }).format(new Date(item.startsAt))}`
-                : ''}
+              {item.startsAt ? ` · ${formatDate(item.startsAt)}` : ''}
             </p>
           </a>
         </li>
@@ -270,30 +277,118 @@ function EventsPreview() {
   );
 }
 
+function PodcastShelf() {
+  const podcasts = useSections('podcasts');
+  const items = (podcasts.data ?? [])
+    .flatMap((section) => section.items)
+    .sort((a, b) => {
+      const aTime = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
+      const bTime = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
+      return bTime - aTime;
+    })
+    .slice(0, 3);
+
+  if (podcasts.isLoading) {
+    return (
+      <div className="grid gap-4 sm:grid-cols-3">
+        {[0, 1, 2].map((index) => (
+          <Skeleton key={index} className="h-32 w-full rounded-lg" />
+        ))}
+      </div>
+    );
+  }
+
+  if (podcasts.isError || items.length === 0) {
+    return (
+      <EmptyPreview>
+        Episodes from The Changelog, freeCodeCamp, Software Engineering Daily, InfoQ and Syntax will
+        appear here.
+      </EmptyPreview>
+    );
+  }
+
+  return (
+    <div className="grid gap-4 sm:grid-cols-3">
+      {items.map((item) => (
+        <PodcastMini key={item.id} item={item} />
+      ))}
+    </div>
+  );
+}
+
+function PodcastMini({ item }: { item: ExternalItem }) {
+  const publisher = stringMeta(item.metadata, 'publisher') ?? item.author;
+  const duration = numberMeta(item.metadata, 'durationSeconds');
+  const minutes = duration ? Math.max(1, Math.round(duration / 60)) : null;
+
+  return (
+    <a
+      href={item.url}
+      target="_blank"
+      rel="noreferrer noopener"
+      className="focus-ring group flex gap-3 rounded-lg border border-line bg-surface p-2.5 transition-colors hover:border-lineStrong"
+    >
+      <span className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-md border border-line bg-raised text-accent">
+        {item.imageUrl ? (
+          <img
+            src={item.imageUrl}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            referrerPolicy="no-referrer"
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <Mic size={16} aria-hidden="true" />
+        )}
+      </span>
+      <span className="min-w-0">
+        <span className="block truncate font-mono text-[9.5px] uppercase tracking-[0.1em] text-subtle">
+          {publisher ?? 'Podcast'}
+        </span>
+        <span className="mt-0.5 line-clamp-2 block text-[12.5px] font-medium leading-snug text-ink transition-colors group-hover:text-accent">
+          {item.title}
+        </span>
+        <span className="mt-1 block font-mono text-[9.5px] uppercase tracking-[0.08em] text-subtle">
+          {minutes ? `${minutes} min` : ''}
+          {minutes && item.publishedAt ? ' · ' : ''}
+          {item.publishedAt ? formatDate(item.publishedAt) : ''}
+        </span>
+      </span>
+    </a>
+  );
+}
+
 const INSIDE = [
   {
     number: '01',
     title: 'Buzz',
     description:
-      'Post a title and a body, reply in threads, vote on what helped you. Posts publish immediately; reports go to a human-reviewed moderation queue.',
+      'Post a title and a body, reply in threads, vote on what helped you. Mentions and links work the way you expect, and drafts stay on your device until you publish.',
   },
   {
     number: '02',
     title: 'News',
     description:
-      'Five curated sections, refreshed from publisher feeds by the backend worker. Every headline opens at the source instead of a rewritten copy.',
+      'Five curated sections covering the industry, AI and research, security, platform announcements and Indian technology — each headline opening at the original publication.',
   },
   {
     number: '03',
     title: 'Trending',
     description:
-      'Repositories, models, datasets, papers, videos and podcasts — each rendered with the metadata that actually matters for its type.',
+      'Repositories, models, datasets, papers and videos, each presented with the details that actually matter for that kind of work.',
   },
   {
     number: '04',
+    title: 'Podcasts',
+    description:
+      'Five long-running shows about building software, collected in one place so you can catch up on the episodes you missed.',
+  },
+  {
+    number: '05',
     title: 'Events',
     description:
-      'Hackathons, rated contests and CTF competitions, grouped by status so ongoing events do not get buried under next month’s.',
+      'Hackathons, rated contests and Capture the Flag competitions, grouped so ongoing events never get buried under next month’s.',
   },
 ];
 
@@ -307,7 +402,7 @@ export function LandingPage() {
         <div className="max-w-3xl">
           <p className="flex items-center gap-2 font-mono text-[10.5px] uppercase tracking-[0.16em] text-subtle">
             <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true" />
-            Buzz · News · Trending · Events
+            Buzz · News · Trending · Podcasts · Events
           </p>
 
           <h1 className="mt-5 font-serif text-[46px] leading-[0.98] tracking-[-0.025em] text-ink sm:text-[64px] lg:text-[76px]">
@@ -318,8 +413,9 @@ export function LandingPage() {
 
           <p className="mt-6 max-w-xl text-[15px] leading-[1.65] text-muted">
             A community for people who build software: discuss what you are working on, read the
-            day’s technology reporting, find the repositories and papers worth your attention, and
-            keep track of the events worth blocking your calendar for.
+            day&apos;s technology reporting, find the projects worth your attention, listen to the
+            shows that explain how things work, and keep track of the events worth blocking your
+            calendar for.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -339,13 +435,13 @@ export function LandingPage() {
           </div>
 
           <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.12em] text-subtle">
-            Free · Email verification with a one-time code · No tracking pixels
+            Free to join · One-time email verification · No tracking pixels
           </p>
         </div>
       </section>
 
       <section
-        aria-label="Live previews"
+        aria-label="What is happening now"
         className="mx-auto mt-14 w-full max-w-6xl px-4 sm:px-6 lg:mt-20 lg:px-8"
       >
         <div className="grid gap-3 sm:grid-cols-2">
@@ -361,17 +457,16 @@ export function LandingPage() {
           <PreviewShell title="Coming up" to="/events" icon={CalendarDays}>
             <EventsPreview />
           </PreviewShell>
+          <PreviewShell title="Latest episodes" to="/podcasts" icon={Mic} wide>
+            <PodcastShelf />
+          </PreviewShell>
         </div>
-        <p className="mt-3 text-[11.5px] text-subtle">
-          These previews are live API data. Empty sections mean the backend cache has not been
-          refreshed yet, not that the section is decorative.
-        </p>
       </section>
 
       <section className="mx-auto mt-20 w-full max-w-6xl px-4 sm:px-6 lg:mt-28 lg:px-8">
         <div className="border-t border-line pt-8">
           <h2 className="font-serif text-[30px] leading-tight tracking-[-0.02em] text-ink sm:text-[36px]">
-            Four sections, one reading habit
+            Five sections, one reading habit
           </h2>
 
           <div className="mt-8 grid gap-x-10 gap-y-8 sm:grid-cols-2">
@@ -418,6 +513,20 @@ export function LandingPage() {
               </Link>
             </div>
           </div>
+
+          {!isAuthenticated ? (
+            <p className="mt-6 text-[11.5px] leading-relaxed text-subtle">
+              By creating an account you agree to our{' '}
+              <Link to="/terms" className="text-muted underline underline-offset-2 hover:text-ink">
+                Terms of Service
+              </Link>{' '}
+              and{' '}
+              <Link to="/privacy" className="text-muted underline underline-offset-2 hover:text-ink">
+                Privacy Policy
+              </Link>
+              .
+            </p>
+          ) : null}
         </div>
       </section>
     </div>

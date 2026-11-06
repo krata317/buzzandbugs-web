@@ -97,7 +97,7 @@ export function ProfilePage() {
           notFound
             ? 'This account does not exist, or a block prevents you from seeing it.'
             : offline
-              ? 'The API is not reachable. Start the backend and try again.'
+              ? 'Check your connection and try again.'
               : errorMessage(profile.error)
         }
         onRetry={notFound ? undefined : () => void profile.refetch()}

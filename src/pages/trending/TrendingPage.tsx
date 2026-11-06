@@ -21,7 +21,7 @@ export function TrendingPage() {
         serif
         eyebrow="Discover"
         title="Trending"
-        description="Repositories, models, datasets, papers and podcasts that developers are paying attention to."
+        description="Repositories, models, datasets, papers and videos that developers are paying attention to right now."
       />
 
       <SectionNav kind="trending" basePath="/trending" sections={TRENDING_SECTIONS} />
@@ -45,8 +45,8 @@ export function TrendingPage() {
           title={offline ? 'Trending could not load' : 'Trending could not be fetched'}
           description={
             offline
-              ? 'The API is not reachable. Start the backend and try again.'
-              : 'The request failed. Trending sections are cached, so this is usually temporary.'
+              ? 'The connection was interrupted. Check your network and try again.'
+              : 'The request failed. Try again in a moment.'
           }
           onRetry={() => void trending.refetch()}
           offline={offline}
@@ -56,13 +56,18 @@ export function TrendingPage() {
       {trending.data && sections.length === 0 ? (
         <EmptyState
           icon={<TrendingUp size={22} />}
-          title="Nothing cached yet"
-          description="Trending is refreshed by the backend worker. Start it with npm run dev:worker, or force a refresh from the admin sources page."
+          title="Nothing trending yet"
+          description="Popular repositories, models, datasets, papers and videos will appear here as they gain attention."
         />
       ) : null}
 
       {sections.map((section) => (
-        <section key={section.section} aria-labelledby={`trending-${section.section}`}>
+        <section
+          key={section.section}
+          id={`section-${section.section}`}
+          className="scroll-mt-24"
+          aria-labelledby={`trending-${section.section}`}
+        >
           <div className="mb-3 flex items-baseline justify-between gap-3 border-b border-line pb-2">
             <div>
               <h2
@@ -79,7 +84,7 @@ export function TrendingPage() {
               to={`/trending/${section.section}`}
               className="focus-ring inline-flex shrink-0 items-center gap-1 text-[11.5px] text-muted transition-colors hover:text-accent"
             >
-              All {section.total}
+              View more
               <ArrowRight size={12} aria-hidden="true" />
             </Link>
           </div>

@@ -9,6 +9,11 @@ import type {
 } from './types';
 
 export const usersApi = {
+  search: (query: string, signal?: AbortSignal) =>
+    api
+      .get<ApiEnvelope<PublicAuthor[]>>('/users/search', { query: { q: query, limit: 8 }, signal })
+      .then((response) => response.data),
+
   profile: (username: string, signal?: AbortSignal) =>
     api
       .get<ApiEnvelope<Profile>>(`/users/${encodeURIComponent(username)}`, { signal })

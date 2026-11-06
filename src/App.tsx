@@ -53,6 +53,20 @@ const EventsSectionPage = lazy(() =>
     default: module.EventsSectionPage,
   })),
 );
+const PodcastsPage = lazy(() =>
+  import('@/pages/podcasts/PodcastsPage').then((module) => ({ default: module.PodcastsPage })),
+);
+const PodcastsSectionPage = lazy(() =>
+  import('@/pages/podcasts/PodcastsSectionPage').then((module) => ({
+    default: module.PodcastsSectionPage,
+  })),
+);
+const TermsPage = lazy(() =>
+  import('@/pages/legal/TermsPage').then((module) => ({ default: module.TermsPage })),
+);
+const PrivacyPage = lazy(() =>
+  import('@/pages/legal/PrivacyPage').then((module) => ({ default: module.PrivacyPage })),
+);
 const NotificationsPage = lazy(() =>
   import('@/pages/notifications/NotificationsPage').then((module) => ({
     default: module.NotificationsPage,
@@ -168,6 +182,8 @@ export default function App() {
               <Routes>
                 <Route element={<PublicLayout />}>
                   <Route index element={<LandingPage />} />
+                  <Route path="terms" element={<TermsPage />} />
+                  <Route path="privacy" element={<PrivacyPage />} />
                 </Route>
 
                 <Route element={<AppShell />}>
@@ -179,6 +195,8 @@ export default function App() {
                   <Route path="trending/:section" element={<TrendingSectionPage />} />
                   <Route path="events" element={<EventsPage />} />
                   <Route path="events/:section" element={<EventsSectionPage />} />
+                  <Route path="podcasts" element={<PodcastsPage />} />
+                  <Route path="podcasts/:section" element={<PodcastsSectionPage />} />
                   <Route path="users/:username" element={<ProfilePage />} />
                   <Route
                     path="notifications"

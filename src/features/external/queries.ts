@@ -11,24 +11,17 @@ export function useSections(kind: ExternalKind, enabled = true) {
   });
 }
 
-interface SectionParam {
-  offset: number;
-  seed?: string;
-}
-
 export function useSectionItems(kind: ExternalKind, section: string, pageSize = 12) {
   return useInfiniteQuery({
     queryKey: queryKeys.sectionPage(kind, section),
     queryFn: ({ pageParam, signal }) =>
       externalApi.sectionPage(kind, section, {
-        offset: pageParam.offset,
-        seed: pageParam.seed,
+        offset: pageParam,
         limit: pageSize,
         signal,
       }),
-    initialPageParam: { offset: 0 } as SectionParam,
-    getNextPageParam: (last) =>
-      last.hasMore ? { offset: last.offset + last.items.length, seed: last.seed } : undefined,
+    initialPageParam: 0,
+    getNextPageParam: (last) => (last.hasMore ? last.offset + last.items.length : undefined),
     staleTime: 2 * 60_000,
   });
 }

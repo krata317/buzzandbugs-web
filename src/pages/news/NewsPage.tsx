@@ -21,7 +21,7 @@ export function NewsPage() {
         serif
         eyebrow="Reading"
         title="News"
-        description="Reporting from the feeds that cover this industry best. Every headline opens at the original publisher."
+        description="Reporting from the publications that cover this industry best. Every headline opens at the original source."
       />
 
       <SectionNav kind="news" basePath="/news" sections={NEWS_SECTIONS} />
@@ -44,8 +44,8 @@ export function NewsPage() {
           title={offline ? 'News could not load' : 'News could not be fetched'}
           description={
             offline
-              ? 'The API is not reachable. Start the backend and try again.'
-              : 'The request failed. External sections are served from a cache, so this is usually temporary.'
+              ? 'The connection was interrupted. Check your network and try again.'
+              : 'The request failed. Try again in a moment.'
           }
           onRetry={() => void news.refetch()}
           offline={offline}
@@ -55,42 +55,45 @@ export function NewsPage() {
       {news.data && sections.length === 0 ? (
         <EmptyState
           icon={<Newspaper size={22} />}
-          title="No articles cached yet"
-          description="News is refreshed by the backend worker. Start the worker (npm run dev:worker) or force a refresh from the admin sources page."
+          title="Today's stories are on their way"
+          description="Fresh reporting from across the technology press will appear here shortly."
         />
       ) : null}
 
-      {sections.map((section, index) => {
-        const [lead, ...rest] = section.items;
-        if (!lead) return null;
+      {sections.map((section) => (
+        <section
+          key={section.section}
+          id={`section-${section.section}`}
+          className="scroll-mt-24"
+          aria-labelledby={`news-${section.section}`}
+        >
+          <div className="mb-3 flex items-baseline justify-between gap-3 border-b border-line pb-2">
+            <h2
+              id={`news-${section.section}`}
+              className="text-[13px] font-semibold uppercase tracking-[0.1em] text-ink"
+            >
+              {sectionLabel('news', section.section)}
+            </h2>
+            <Link
+              to={`/news/${section.section}`}
+              className="focus-ring inline-flex shrink-0 items-center gap-1 text-[11.5px] text-muted transition-colors hover:text-accent"
+            >
+              View more
+              <ArrowRight size={12} aria-hidden="true" />
+            </Link>
+          </div>
 
-        return (
-          <section key={section.section} aria-labelledby={`news-${section.section}`}>
-            <div className="mb-3 flex items-baseline justify-between gap-3 border-b border-line pb-2">
-              <h2
-                id={`news-${section.section}`}
-                className="text-[13px] font-semibold uppercase tracking-[0.1em] text-ink"
-              >
-                {sectionLabel('news', section.section)}
-              </h2>
-              <Link
-                to={`/news/${section.section}`}
-                className="focus-ring inline-flex shrink-0 items-center gap-1 text-[11.5px] text-muted transition-colors hover:text-accent"
-              >
-                All {section.total}
-                <ArrowRight size={12} aria-hidden="true" />
-              </Link>
-            </div>
-
-            <div className={index === 0 ? 'space-y-1' : 'space-y-0.5'}>
-              <NewsLeadCard item={lead} />
-              {rest.map((item) => (
+          <div className="space-y-2">
+            {section.items.map((item) =>
+              item.imageUrl ? (
+                <NewsLeadCard key={item.id} item={item} />
+              ) : (
                 <NewsRow key={item.id} item={item} />
-              ))}
-            </div>
-          </section>
-        );
-      })}
+              ),
+            )}
+          </div>
+        </section>
+      ))}
     </div>
   );
 }

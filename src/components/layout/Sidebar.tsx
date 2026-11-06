@@ -3,9 +3,11 @@ import { Link, NavLink } from 'react-router-dom';
 import {
   Bell,
   CalendarDays,
-  ChevronUp,
+  ChevronLeft,
+  ChevronRight,
   LogOut,
   MessageSquare,
+  Mic,
   Newspaper,
   Settings,
   TrendingUp,
@@ -23,6 +25,7 @@ const PRIMARY_NAV = [
   { to: '/buzz', label: 'Buzz', icon: MessageSquare },
   { to: '/news', label: 'News', icon: Newspaper },
   { to: '/trending', label: 'Trending', icon: TrendingUp },
+  { to: '/podcasts', label: 'Podcasts', icon: Mic },
   { to: '/events', label: 'Events', icon: CalendarDays },
 ] as const;
 
@@ -31,8 +34,18 @@ const SECONDARY_NAV = [
   { to: '/settings', label: 'Settings', icon: Settings },
 ] as const;
 
-function UnreadBadge({ count }: { count: number }) {
+function UnreadBadge({ count, collapsed }: { count: number; collapsed: boolean }) {
   if (count <= 0) return null;
+
+  if (collapsed) {
+    return (
+      <span
+        className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-accent ring-2 ring-canvas"
+        aria-hidden="true"
+      />
+    );
+  }
+
   return (
     <span className="ml-auto rounded-full bg-accent/12 px-1.5 py-0.5 font-mono text-[10px] font-medium leading-none text-accent">
       {count > 99 ? '99+' : count}
@@ -45,35 +58,48 @@ export function NavItem({
   label,
   icon: Icon,
   badge,
+  collapsed,
   onNavigate,
 }: {
   to: string;
   label: string;
   icon: typeof Bell;
   badge?: number;
+  collapsed?: boolean;
   onNavigate?: () => void;
 }) {
   return (
-    <NavLink to={to} onClick={onNavigate} className="nav-link">
+    <NavLink
+      to={to}
+      onClick={onNavigate}
+      aria-label={label}
+      data-tooltip={collapsed ? label : undefined}
+      className={cn('nav-link', collapsed && 'justify-center px-0')}
+    >
       {({ isActive }) => (
         <>
           <span
             className={cn(
-              'flex h-7 w-7 items-center justify-center rounded-md transition-colors',
+              'relative flex h-7 w-7 items-center justify-center rounded-md transition-colors',
               isActive ? 'text-accent' : 'text-subtle',
             )}
           >
             <Icon size={17} strokeWidth={isActive ? 2.2 : 1.9} aria-hidden="true" />
+            {badge ? <UnreadBadge count={badge} collapsed={Boolean(collapsed)} /> : null}
           </span>
-          <span className={cn(isActive && 'text-ink')}>{label}</span>
-          {badge ? <UnreadBadge count={badge} /> : null}
+          {!collapsed ? (
+            <>
+              <span className={cn(isActive && 'text-ink')}>{label}</span>
+              {badge ? <UnreadBadge count={badge} collapsed={false} /> : null}
+            </>
+          ) : null}
         </>
       )}
     </NavLink>
   );
 }
 
-function AccountMenu() {
+function AccountMenu({ collapsed }: { collapsed: boolean }) {
   const { user, signOut } = useAuth();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -95,6 +121,19 @@ function AccountMenu() {
   }, [open]);
 
   if (!user) {
+    if (collapsed) {
+      return (
+        <Link
+          to="/login"
+          aria-label="Sign in"
+          data-tooltip="Sign in"
+          className="focus-ring flex h-9 w-9 items-center justify-center rounded-full border border-line text-muted transition-colors hover:text-ink"
+        >
+          <User size={16} />
+        </Link>
+      );
+    }
+
     return (
       <div className="space-y-2">
         <Link
@@ -118,7 +157,10 @@ function AccountMenu() {
       {open ? (
         <div
           role="menu"
-          className="absolute bottom-full left-0 right-0 mb-2 animate-scale-in overflow-hidden rounded-lg border border-line bg-surface p-1 shadow-lift"
+          className={cn(
+            'absolute z-50 mb-2 animate-scale-in overflow-hidden rounded-lg border border-line bg-surface p-1 shadow-lift',
+            collapsed ? 'bottom-0 left-full ml-2 w-44' : 'bottom-full left-0 right-0',
+          )}
         >
           <Link
             to={`/users/${user.username}`}
@@ -127,14 +169,6 @@ function AccountMenu() {
             className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-[13px] text-ink transition-colors hover:bg-raised"
           >
             <User size={14} className="text-subtle" /> Your profile
-          </Link>
-          <Link
-            to="/settings"
-            role="menuitem"
-            onClick={() => setOpen(false)}
-            className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-[13px] text-ink transition-colors hover:bg-raised"
-          >
-            <Settings size={14} className="text-subtle" /> Settings
           </Link>
           <div className="my-1 h-px bg-line" />
           <button
@@ -156,72 +190,111 @@ function AccountMenu() {
         onClick={() => setOpen((current) => !current)}
         aria-haspopup="menu"
         aria-expanded={open}
-        className="focus-ring flex w-full items-center gap-2.5 rounded-lg border border-transparent p-2 text-left transition-colors hover:border-line hover:bg-raised"
+        aria-label="Account menu"
+        data-tooltip={collapsed ? user.displayName : undefined}
+        className={cn(
+          'focus-ring flex w-full items-center gap-2.5 rounded-lg border border-transparent p-2 text-left transition-colors hover:border-line hover:bg-raised',
+          collapsed && 'justify-center p-1.5',
+        )}
       >
         <Avatar src={user.avatarUrl} name={user.displayName} size="sm" ring />
-        <span className="min-w-0 flex-1">
-          <span className="block truncate text-[13px] font-medium leading-tight text-ink">
-            {user.displayName}
+        {!collapsed ? (
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-[13px] font-medium leading-tight text-ink">
+              {user.displayName}
+            </span>
+            <span className="block truncate font-mono text-[11px] leading-tight text-subtle">
+              @{user.username}
+            </span>
           </span>
-          <span className="block truncate font-mono text-[11px] leading-tight text-subtle">
-            @{user.username}
-          </span>
-        </span>
-        <ChevronUp
-          size={14}
-          className={cn('shrink-0 text-subtle transition-transform', open && 'rotate-180')}
-          aria-hidden="true"
-        />
+        ) : null}
       </button>
     </div>
   );
 }
 
-export function Sidebar() {
-  const { user, isAuthenticated } = useAuth();
+export function Sidebar({
+  collapsed,
+  onToggle,
+}: {
+  collapsed: boolean;
+  onToggle: () => void;
+}) {
+  const { isAuthenticated } = useAuth();
   const unread = useUnreadCount();
   const unreadCount = unread.data ?? 0;
 
   return (
-    <aside className="sticky top-0 hidden h-screen w-[236px] shrink-0 flex-col border-r border-line px-3.5 py-5 lg:flex xl:w-[248px]">
-      <div className="px-2">
-        <Logo />
+    <aside
+      className={cn(
+        'sticky top-0 hidden h-screen shrink-0 flex-col border-r border-line py-5 transition-[width,padding] duration-200 ease-out lg:flex',
+        collapsed ? 'w-[76px] px-2.5' : 'w-[236px] px-3.5 xl:w-[248px]',
+      )}
+      data-collapsed={collapsed}
+    >
+      <div className={cn('flex items-center', collapsed ? 'justify-center' : 'justify-between px-2')}>
+        <Logo showWordmark={!collapsed} />
       </div>
 
       <nav aria-label="Primary" className="mt-7 space-y-0.5">
         {PRIMARY_NAV.map((item) => (
-          <NavItem key={item.to} {...item} />
+          <NavItem key={item.to} {...item} collapsed={collapsed} />
         ))}
       </nav>
 
-      <div className="my-4 h-px bg-line" />
+      <div className={cn('my-4 h-px bg-line', collapsed && 'mx-1')} />
 
       <nav aria-label="Your account" className="space-y-0.5">
         {SECONDARY_NAV.map((item) => (
           <NavItem
             key={item.to}
             {...item}
+            collapsed={collapsed}
             badge={item.to === '/notifications' ? unreadCount : undefined}
           />
         ))}
-        {user ? (
-          <NavItem to={`/users/${user.username}`} label="Profile" icon={User} />
-        ) : null}
       </nav>
 
-      <div className="mt-auto pt-6">
-        {!isAuthenticated ? (
-          <div className="mb-4 rounded-lg border border-line bg-raised/60 px-3 py-3">
+      <div className="mt-auto space-y-2 pt-6">
+        {!isAuthenticated && !collapsed ? (
+          <div className="rounded-lg border border-line bg-raised/60 px-3 py-3">
             <p className="text-[12.5px] leading-relaxed text-muted">
               Join the conversation. Post, reply and follow the developers you learn from.
             </p>
           </div>
         ) : null}
-        <div className="mb-2 flex items-center justify-between px-1">
-          <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-subtle">Theme</span>
-          <ThemeToggle />
+
+        <div
+          className={cn(
+            'flex items-center',
+            collapsed ? 'flex-col gap-1.5' : 'justify-between px-1',
+          )}
+        >
+          <span
+            className={cn(
+              'font-mono text-[10px] uppercase tracking-[0.1em] text-subtle',
+              collapsed && 'sr-only',
+            )}
+          >
+            Theme
+          </span>
+          <div className={cn('flex items-center gap-1', collapsed && 'flex-col')}>
+            <ThemeToggle />
+            <button
+              type="button"
+              onClick={onToggle}
+              aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              aria-expanded={!collapsed}
+              title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              data-tooltip={collapsed ? 'Expand sidebar' : undefined}
+              className="focus-ring relative inline-flex h-7 w-7 items-center justify-center rounded-md text-subtle transition-colors hover:bg-raised hover:text-ink"
+            >
+              {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+            </button>
+          </div>
         </div>
-        <AccountMenu />
+
+        <AccountMenu collapsed={collapsed} />
       </div>
     </aside>
   );
