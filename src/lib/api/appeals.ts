@@ -15,7 +15,7 @@ export const appealsApi = {
       .post<ApiEnvelope<{ caseId: string; status: string }>>(
         `/appeals/${encodeURIComponent(token)}`,
         { message },
-        { scope: 'none' },
+        { scope: 'user' },
       )
       .then((response) => response.data),
 };

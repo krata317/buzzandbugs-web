@@ -19,8 +19,8 @@ export function PrivacyPage() {
             stored only as a one-way hash.
           </li>
           <li>
-            <strong>Profile data you choose to add:</strong> a short biography, links to other
-            profiles, and an uploaded profile picture.
+            <strong>Profile data you choose to add:</strong> a short biography and links to other
+            profiles. A profile picture is generated for every account and is not uploaded.
           </li>
           <li>
             <strong>Content you publish:</strong> posts, replies, votes, reports and appeals.
@@ -125,7 +125,7 @@ export function PrivacyPage() {
           </li>
           <li>
             After an account is deleted, published posts and replies remain but are anonymised; the
-            profile, email address and uploaded picture are removed.
+            profile, email address and profile picture are removed.
           </li>
         </ul>
       </section>
@@ -134,8 +134,8 @@ export function PrivacyPage() {
         <h2>6. Your choices and rights</h2>
         <ul>
           <li>
-            You can edit your display name, biography, links and picture, and control which profile
-            details are public, in Settings.
+            You can edit your display name, biography and links, and control which profile details
+            are public, in Settings.
           </li>
           <li>You can delete individual posts and replies at any time.</li>
           <li>

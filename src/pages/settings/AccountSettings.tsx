@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
-import { KeyRound, LogOut, ShieldAlert, Trash2, UserX } from 'lucide-react';
+import { KeyRound, LogOut, Trash2, UserX } from 'lucide-react';
 import { authApi, errorMessage, isApiError } from '@/lib/api';
 import { queryKeys } from '@/features/queryKeys';
 import { useAuth } from '@/providers/AuthProvider';
 import { useBlockedUsers, useBlock } from '@/features/users/queries';
-import { formatDateTime } from '@/lib/format';
 import { validatePassword } from '@/lib/validation';
 import { useToast } from '@/providers/ToastProvider';
 import { Avatar } from '@/components/ui/Avatar';
@@ -46,19 +45,6 @@ export function AccountSettings() {
 
   const requestDeletion = useMutation({ mutationFn: authApi.requestAccountDeletion });
   const confirmDeletion = useMutation({ mutationFn: authApi.confirmAccountDeletion });
-  const cancelDeletion = useMutation({
-    mutationFn: authApi.cancelAccountDeletion,
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: queryKeys.me });
-      toast.push({ title: 'Account deletion cancelled', tone: 'success' });
-    },
-    onError: (error) =>
-      toast.push({
-        title: 'Could not cancel the deletion',
-        description: errorMessage(error),
-        tone: 'error',
-      }),
-  });
 
   const submitPassword = (confirmRevocation: boolean) => {
     if (!currentPassword) {
@@ -103,32 +89,6 @@ export function AccountSettings() {
 
   return (
     <div className="space-y-4">
-      {me?.pendingDeletion ? (
-        <div className="flex flex-wrap items-start justify-between gap-3 rounded-xl border border-danger/30 bg-danger/5 p-4">
-          <div className="flex items-start gap-3">
-            <ShieldAlert size={17} className="mt-0.5 shrink-0 text-danger" aria-hidden="true" />
-            <div>
-              <p className="text-[13.5px] font-medium text-ink">Account deletion is scheduled</p>
-              <p className="mt-1 text-[12.5px] leading-relaxed text-muted">
-                This account will be anonymised on{' '}
-                <span className="font-medium text-ink">
-                  {formatDateTime(me.pendingDeletion.scheduledFor)}
-                </span>
-                . Until then you can cancel.
-              </p>
-            </div>
-          </div>
-          <Button
-            variant="secondary"
-            size="sm"
-            loading={cancelDeletion.isPending}
-            onClick={() => cancelDeletion.mutate()}
-          >
-            Cancel deletion
-          </Button>
-        </div>
-      ) : null}
-
       <SettingsCard
         title="Password"
         description="Changing your password signs out every active session, including this one."
@@ -263,7 +223,10 @@ export function AccountSettings() {
             variant="secondary"
             size="sm"
             iconLeft={<LogOut size={13} />}
-            onClick={() => void signOut()}
+            onClick={() => {
+              navigate('/', { replace: true });
+              void signOut();
+            }}
           >
             Sign out
           </Button>

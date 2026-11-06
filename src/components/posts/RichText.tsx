@@ -43,8 +43,8 @@ function Inline({ node }: { node: RichTextNode }) {
 
     if (username && !deleted) {
       return (
-        <Link to={`/users/${username}`} className="mention">
-          @{label ?? username}
+        <Link to={`/users/${username}`} className="mention" title={label ?? `@${username}`}>
+          @{username}
         </Link>
       );
     }

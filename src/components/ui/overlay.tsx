@@ -176,7 +176,7 @@ export function Menu({ trigger, triggerLabel, items, align = 'end' }: MenuProps)
           aria-label={triggerLabel}
           onKeyDown={onPanelKeyDown}
           className={cn(
-            'absolute z-40 mt-1 min-w-[168px] animate-scale-in overflow-hidden rounded-lg border border-line bg-surface p-1 shadow-lift',
+            'absolute z-50 mt-1 min-w-[168px] animate-scale-in overflow-hidden rounded-lg border border-line bg-surface p-1 shadow-lift',
             align === 'end' ? 'right-0' : 'left-0',
           )}
         >

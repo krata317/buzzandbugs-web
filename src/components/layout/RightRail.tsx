@@ -30,9 +30,9 @@ function RailCard({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-xl border border-line bg-surface p-4">
+    <section className="panel p-4">
       <div className="mb-3 flex items-center justify-between gap-2">
-        <h2 className="text-[12px] font-semibold uppercase tracking-[0.1em] text-muted">{title}</h2>
+        <h2 className="stat-label">{title}</h2>
         {action}
       </div>
       {children}

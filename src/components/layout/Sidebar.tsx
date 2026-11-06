@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import {
   Bell,
   CalendarDays,
@@ -102,10 +102,19 @@ export function NavItem({
 
 function AccountMenu({ collapsed }: { collapsed: boolean }) {
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
   useClickOutside(rootRef, () => setOpen(false), open);
+
+  const leave = async () => {
+    setOpen(false);
+    // Leave the protected area first: clearing the session while still on an app route makes
+    // the route guard redirect to /login before this navigation can run.
+    navigate('/', { replace: true });
+    await signOut();
+  };
 
   if (!user) {
     if (collapsed) {
@@ -161,10 +170,7 @@ function AccountMenu({ collapsed }: { collapsed: boolean }) {
           <button
             type="button"
             role="menuitem"
-            onClick={() => {
-              setOpen(false);
-              void signOut();
-            }}
+            onClick={() => void leave()}
             className="flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-[13px] text-muted transition-colors hover:bg-raised hover:text-ink"
           >
             <LogOut size={14} /> Sign out
@@ -214,7 +220,8 @@ export function Sidebar({
   return (
     <aside
       className={cn(
-        'sticky top-0 hidden h-screen shrink-0 flex-col border-r border-line py-5 transition-[width,padding] duration-200 ease-out lg:flex',
+        'sticky top-0 z-40 hidden h-screen shrink-0 flex-col border-r border-line py-5 transition-[width,padding] duration-200 ease-out lg:flex',
+        'bg-[linear-gradient(180deg,rgb(var(--raised)/0.65),rgb(var(--canvas))_42%)]',
         collapsed ? 'w-[76px] px-2.5' : 'w-[236px] px-3.5 xl:w-[248px]',
       )}
       data-collapsed={collapsed}

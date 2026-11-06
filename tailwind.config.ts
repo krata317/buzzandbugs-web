@@ -18,6 +18,8 @@ export default {
         subtle: withAlpha('--subtle'),
         accent: withAlpha('--accent'),
         accentInk: withAlpha('--accent-ink'),
+        accent2: withAlpha('--accent-2'),
+        accent2Ink: withAlpha('--accent-2-ink'),
         up: withAlpha('--up'),
         down: withAlpha('--down'),
         danger: withAlpha('--danger'),

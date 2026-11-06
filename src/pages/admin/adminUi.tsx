@@ -11,11 +11,13 @@ export function AdminHeader({
   actions?: ReactNode;
 }) {
   return (
-    <div className="flex flex-wrap items-end justify-between gap-4 pb-5">
+    <div className="flex flex-wrap items-end justify-between gap-4 pb-6">
       <div>
-        <h1 className="text-[21px] font-semibold tracking-[-0.02em] text-ink">{title}</h1>
+        <h1 className="font-serif text-[30px] leading-[1.02] tracking-[-0.025em] text-ink sm:text-[36px]">
+          {title}
+        </h1>
         {description ? (
-          <p className="mt-1 max-w-2xl text-[12.5px] leading-relaxed text-muted">{description}</p>
+          <p className="mt-2 max-w-2xl text-[12.5px] leading-relaxed text-muted">{description}</p>
         ) : null}
       </div>
       {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
@@ -37,14 +39,23 @@ export function StatCard({
   return (
     <div
       className={cn(
-        'rounded-lg border border-line bg-surface px-3.5 py-3',
-        tone === 'warning' && 'border-amber-500/30 bg-amber-500/[0.06]',
-        tone === 'danger' && 'border-danger/25 bg-danger/[0.05]',
+        'panel relative overflow-hidden px-4 py-3.5',
+        tone === 'warning' && 'border-amber-500/30 bg-amber-500/[0.05]',
+        tone === 'danger' && 'border-danger/25 bg-danger/[0.04]',
       )}
     >
-      <p className="font-mono text-[9.5px] uppercase tracking-[0.1em] text-subtle">{label}</p>
-      <p className="mt-1 font-mono text-[22px] leading-none text-ink">{value}</p>
-      {hint ? <p className="mt-1 text-[11px] text-muted">{hint}</p> : null}
+      <span
+        aria-hidden="true"
+        className={cn(
+          'absolute inset-y-0 left-0 w-[3px]',
+          tone === 'default' && 'bg-gradient-to-b from-accent to-accent/0',
+          tone === 'warning' && 'bg-gradient-to-b from-amber-500 to-amber-500/0',
+          tone === 'danger' && 'bg-gradient-to-b from-danger to-danger/0',
+        )}
+      />
+      <p className="stat-label">{label}</p>
+      <p className="stat-value mt-2">{value}</p>
+      {hint ? <p className="mt-1.5 text-[11px] text-muted">{hint}</p> : null}
     </div>
   );
 }

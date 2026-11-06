@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, type ReactNode } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { QueryProvider } from '@/providers/QueryProvider';
 import { ToastProvider } from '@/providers/ToastProvider';
@@ -167,10 +167,6 @@ function ScrollToTop() {
   return null;
 }
 
-function Protected({ children }: { children: ReactNode }) {
-  return <RequireAuth>{children}</RequireAuth>;
-}
-
 export default function App() {
   return (
     <QueryProvider>
@@ -186,7 +182,15 @@ export default function App() {
                   <Route path="privacy" element={<PrivacyPage />} />
                 </Route>
 
-                <Route element={<AppShell />}>
+                {/* Everything below the landing page requires a session. The public API stays
+                    open so the landing previews keep working for signed-out visitors. */}
+                <Route
+                  element={
+                    <RequireAuth>
+                      <AppShell />
+                    </RequireAuth>
+                  }
+                >
                   <Route path="buzz" element={<BuzzPage />} />
                   <Route path="posts/:id" element={<PostPage />} />
                   <Route path="news" element={<NewsPage />} />
@@ -198,18 +202,8 @@ export default function App() {
                   <Route path="podcasts" element={<PodcastsPage />} />
                   <Route path="podcasts/:section" element={<PodcastsSectionPage />} />
                   <Route path="users/:username" element={<ProfilePage />} />
-                  <Route
-                    path="notifications"
-                    element={<Protected>{<NotificationsPage />}</Protected>}
-                  />
-                  <Route
-                    path="settings"
-                    element={
-                      <Protected>
-                        <SettingsLayout />
-                      </Protected>
-                    }
-                  >
+                  <Route path="notifications" element={<NotificationsPage />} />
+                  <Route path="settings" element={<SettingsLayout />}>
                     <Route index element={<AppearanceSettings />} />
                     <Route path="profile" element={<ProfileSettings />} />
                     <Route path="sections" element={<SectionsSettings />} />

@@ -5,7 +5,6 @@ import {
   ArrowRight,
   ArrowUpRight,
   CalendarDays,
-  ChevronDown,
   MessageSquare,
   Mic,
   Newspaper,
@@ -27,8 +26,7 @@ import { cn } from '@/lib/cn';
 
 /* ------------------------------------------------------------------ shared */
 
-const PANEL =
-  'group relative flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-surface p-5 lift hover:border-accent/30 hover:shadow-lift sm:p-6';
+const PANEL = 'panel panel-hover group relative flex h-full flex-col overflow-hidden p-5 sm:p-6';
 
 function PanelHeader({
   index,
@@ -40,13 +38,14 @@ function PanelHeader({
   icon: typeof MessageSquare;
 }) {
   return (
-    <div className="flex items-center gap-2.5">
-      <span className="font-mono text-[10px] tracking-[0.16em] text-subtle">{index}</span>
-      <span className="h-3 w-px bg-line" aria-hidden="true" />
-      <span className="inline-flex items-center gap-1.5 text-[11.5px] font-semibold uppercase tracking-[0.11em] text-ink">
-        <Icon size={13} className="text-accent" aria-hidden="true" />
+    <div className="flex items-center justify-between gap-3">
+      <span className="inline-flex items-center gap-2.5 text-[11.5px] font-semibold uppercase tracking-[0.12em] text-ink">
+        <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-line bg-surface text-accent shadow-soft">
+          <Icon size={14} aria-hidden="true" />
+        </span>
         {label}
       </span>
+      <span className="font-mono text-[10px] tracking-[0.18em] text-subtle">{index}</span>
     </div>
   );
 }
@@ -97,7 +96,7 @@ function BuzzPanel({ className }: { className?: string }) {
 
   return (
     <Reveal className={className}>
-      <article className={PANEL}>
+      <article className={cn(PANEL, 'panel-accent accent-rule')}>
         <PanelHeader index="01" label="Buzz" icon={MessageSquare} />
 
         <PanelDescription>
@@ -109,7 +108,7 @@ function BuzzPanel({ className }: { className?: string }) {
           {feed.isLoading ? (
             <ListSkeleton rows={2} />
           ) : items.length === 0 ? (
-            <p className="rounded-lg border border-dashed border-line px-3 py-4 text-[12.5px] leading-relaxed text-muted">
+            <p className="rounded-xl border border-dashed border-line px-3 py-4 text-[12.5px] leading-relaxed text-muted">
               The first threads are being written. Join and start one.
             </p>
           ) : (
@@ -118,7 +117,7 @@ function BuzzPanel({ className }: { className?: string }) {
                 <li key={post.id}>
                   <Link
                     to={`/posts/${post.id}`}
-                    className="focus-ring group/post flex h-full flex-col rounded-lg border border-line/70 bg-canvas/60 p-3 transition-[border-color,background-color,transform] duration-200 hover:-translate-y-0.5 hover:border-accent/30 hover:bg-surface"
+                    className="focus-ring group/post flex h-full flex-col rounded-xl border border-line/80 bg-canvas/70 p-3 transition-[border-color,background-color,transform] duration-200 hover:-translate-y-0.5 hover:border-accent/35 hover:bg-surface"
                   >
                     <p className="line-clamp-2 text-[13px] font-medium leading-snug text-ink transition-colors group-hover/post:text-accent">
                       {post.title}
@@ -164,7 +163,7 @@ function NewsPanel({ className }: { className?: string }) {
           {news.isLoading ? (
             <ListSkeleton />
           ) : !feature ? (
-            <p className="rounded-lg border border-dashed border-line px-3 py-4 text-[12.5px] leading-relaxed text-muted">
+            <p className="rounded-xl border border-dashed border-line px-3 py-4 text-[12.5px] leading-relaxed text-muted">
               Today&apos;s reporting is on its way.
             </p>
           ) : (
@@ -173,7 +172,7 @@ function NewsPanel({ className }: { className?: string }) {
                 href={feature.url}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="focus-ring group/news block overflow-hidden rounded-xl border border-line transition-colors hover:border-accent/30"
+                className="focus-ring group/news block overflow-hidden rounded-xl border border-line transition-colors hover:border-accent/35"
               >
                 {feature.imageUrl ? (
                   <span className="block h-28 overflow-hidden bg-raised sm:h-32">
@@ -187,9 +186,7 @@ function NewsPanel({ className }: { className?: string }) {
                     />
                   </span>
                 ) : null}
-                <span
-                  className={cn('block p-3.5', !feature.imageUrl && 'surface-tint bg-surface')}
-                >
+                <span className={cn('block p-3.5', !feature.imageUrl && 'surface-tint bg-surface')}>
                   <span className="block font-serif text-[19px] leading-[1.2] tracking-[-0.01em] text-ink transition-colors group-hover/news:text-accent">
                     {cleanText(feature.title)}
                   </span>
@@ -241,7 +238,7 @@ function TrendingPanel({ className }: { className?: string }) {
 
   return (
     <Reveal className={className} delay={40}>
-      <article className={cn(PANEL, 'surface-tint bg-raised/40 hover:bg-raised/60')}>
+      <article className={cn(PANEL, 'bg-raised/40')}>
         <PanelHeader index="03" label="Trending" icon={TrendingUp} />
 
         <PanelDescription>
@@ -436,9 +433,9 @@ function PodcastRow({ item }: { item: ExternalItem }) {
       href={item.url}
       target="_blank"
       rel="noreferrer noopener"
-      className="focus-ring group/ep -mx-1.5 flex items-center gap-3 rounded-lg p-1.5 transition-colors hover:bg-raised"
+      className="focus-ring group/ep -mx-1.5 flex items-center gap-3 rounded-xl p-1.5 transition-colors hover:bg-raised"
     >
-      <span className="h-11 w-11 shrink-0 overflow-hidden rounded-md border border-line bg-raised">
+      <span className="h-11 w-11 shrink-0 overflow-hidden rounded-lg border border-line bg-raised">
         {item.imageUrl ? (
           <img
             src={item.imageUrl}
@@ -469,6 +466,104 @@ function PodcastRow({ item }: { item: ExternalItem }) {
   );
 }
 
+/* ------------------------------------------------------------------- hero */
+
+const ORBIT = [
+  { label: 'Buzz', icon: MessageSquare },
+  { label: 'News', icon: Newspaper },
+  { label: 'Trending', icon: TrendingUp },
+  { label: 'Events', icon: CalendarDays },
+  { label: 'Podcasts', icon: Mic },
+];
+
+function HeroOrbit() {
+  return (
+    <div
+      aria-hidden="true"
+      className="relative mx-auto hidden aspect-square w-full max-w-[430px] lg:block"
+    >
+      <div className="absolute inset-0 rounded-full border border-dashed border-line" />
+      <div className="absolute inset-[13%] rounded-full border border-line/70" />
+      <div className="absolute inset-[30%] rounded-full border border-dashed border-line/60" />
+
+      <div className="orbit-ring absolute inset-0">
+        {ORBIT.map((item, index) => {
+          const angle = ((Math.PI * 2) / ORBIT.length) * index - Math.PI / 2;
+          const left = 50 + 46 * Math.cos(angle);
+          const top = 50 + 46 * Math.sin(angle);
+          const Icon = item.icon;
+          return (
+            <span
+              key={item.label}
+              className="absolute"
+              style={{ left: `${left}%`, top: `${top}%`, transform: 'translate(-50%, -50%)' }}
+            >
+              <span className="orbit-node flex h-12 w-12 items-center justify-center rounded-2xl border border-line bg-surface text-accent shadow-lift">
+                <Icon size={18} strokeWidth={1.8} />
+              </span>
+            </span>
+          );
+        })}
+      </div>
+
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="flex h-24 w-24 items-center justify-center rounded-[28px] border border-line bg-surface shadow-lift">
+          <img
+            src="/brand/logo.png"
+            alt=""
+            width={48}
+            height={48}
+            className="h-12 w-12 rounded-xl object-cover ring-1 ring-inset ring-black/10"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const SOURCES = [
+  'The Verge',
+  'TechCrunch',
+  'The Register',
+  'Hacker News',
+  'arXiv',
+  'BleepingComputer',
+  'Cloudflare',
+  'Netflix TechBlog',
+  'GitHub',
+  'Hugging Face',
+  'Papers with Code',
+  'The Changelog',
+  'Syntax',
+  'freeCodeCamp',
+  'Software Engineering Daily',
+  'InfoQ',
+  'LeetCode',
+  'Codeforces',
+  'CTFtime',
+  'Inc42',
+];
+
+function SourceMarquee() {
+  const row = [...SOURCES, ...SOURCES];
+
+  return (
+    <div className="marquee border-y border-line bg-raised/40 py-3.5">
+      <div className="marquee-track items-center gap-10 px-5">
+        {row.map((name, index) => (
+          <span
+            key={`${name}-${index}`}
+            className="flex shrink-0 items-center gap-10 font-mono text-[11px] uppercase tracking-[0.14em] text-subtle"
+          >
+            {name}
+            <span className="h-1 w-1 rounded-full bg-line-strong" aria-hidden="true" />
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ------------------------------------------------------------------- page */
 
 export function LandingPage() {
@@ -480,16 +575,16 @@ export function LandingPage() {
       <section className="relative isolate overflow-hidden">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
           <span className="dot-grid absolute inset-0 opacity-70" />
-          <span className="aura -left-32 -top-40 h-[420px] w-[420px] bg-accent/25" />
+          <span className="aura -left-40 -top-48 h-[520px] w-[520px] bg-accent/25" />
           <span
-            className="aura right-[-8%] top-24 h-[340px] w-[340px] bg-up/[0.12]"
-            style={{ animationDelay: '-8s' }}
+            className="aura right-[-12%] top-10 h-[420px] w-[420px] bg-accent2/[0.10]"
+            style={{ animationDelay: '-9s' }}
           />
         </div>
 
-        <div className="mx-auto w-full max-w-6xl px-4 pb-16 pt-16 sm:px-6 sm:pb-20 sm:pt-20 lg:px-8 lg:pb-24 lg:pt-28">
-          <div className="max-w-3xl">
-            <p className="inline-flex items-center gap-2 rounded-full border border-line bg-surface/70 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-muted backdrop-blur-sm">
+        <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-4 pb-16 pt-14 sm:px-6 sm:pb-20 sm:pt-20 lg:grid-cols-[1.15fr_0.85fr] lg:px-8 lg:pb-24 lg:pt-24">
+          <div>
+            <p className="inline-flex items-center gap-2.5 rounded-full border border-line bg-surface/80 px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-muted backdrop-blur">
               <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent/60" />
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent" />
@@ -497,20 +592,20 @@ export function LandingPage() {
               A community for people who build software
             </p>
 
-            <h1 className="mt-6 font-serif text-[46px] leading-[0.96] tracking-[-0.03em] text-ink sm:text-[64px] lg:text-[78px]">
-              Where developers{' '}
+            <h1 className="mt-7 font-serif text-[52px] leading-[0.92] tracking-[-0.035em] text-ink sm:text-[72px] lg:text-[86px]">
+              Where developers
               <br />
               <span className="relative inline-block text-accent">
                 think out loud
                 <span
                   aria-hidden="true"
-                  className="absolute -bottom-1 left-0 h-[3px] w-full rounded-full bg-accent/25"
+                  className="absolute -bottom-1 left-0 h-[5px] w-full rounded-full bg-gradient-to-r from-accent/45 via-accent/25 to-transparent"
                 />
               </span>
               .
             </h1>
 
-            <p className="mt-7 max-w-xl text-[15.5px] leading-[1.7] text-muted">
+            <p className="mt-8 max-w-xl text-[15.5px] leading-[1.7] text-muted">
               Building software is mostly conversation: a question asked, a decision explained, a
               mistake shared so nobody else repeats it. Buzz and Bugs keeps that conversation beside
               the reporting, projects, shows and events that make it worth following.
@@ -530,27 +625,22 @@ export function LandingPage() {
                   <ArrowRight size={15} aria-hidden="true" />
                 </Link>
               ) : (
-                <>
-                  <Link
-                    to="/register"
-                    className={buttonStyles({
-                      variant: 'primary',
-                      size: 'lg',
-                      className: 'shadow-lift',
-                    })}
-                  >
-                    Create an account
-                    <ArrowRight size={15} aria-hidden="true" />
-                  </Link>
-                  <Link to="/buzz" className={buttonStyles({ variant: 'secondary', size: 'lg' })}>
-                    Browse the feed
-                  </Link>
-                </>
+                <Link
+                  to="/register"
+                  className={buttonStyles({
+                    variant: 'primary',
+                    size: 'lg',
+                    className: 'shadow-lift',
+                  })}
+                >
+                  Create an account
+                  <ArrowRight size={15} aria-hidden="true" />
+                </Link>
               )}
             </div>
 
             {!isAuthenticated ? (
-              <p className="mt-5 text-[12.5px] text-subtle">
+              <p className="mt-6 text-[12.5px] text-subtle">
                 Already have an account?{' '}
                 <Link
                   to="/login"
@@ -563,38 +653,39 @@ export function LandingPage() {
             ) : null}
           </div>
 
-          <a
-            href="#sections"
-            className="focus-ring mt-12 hidden w-fit items-center gap-1.5 rounded-sm text-[12px] font-medium text-subtle transition-colors hover:text-ink lg:inline-flex"
-          >
-            See the five sections
-            <ChevronDown size={13} aria-hidden="true" className="animate-pulse-soft" />
-          </a>
+          <HeroOrbit />
         </div>
       </section>
+
+      <SourceMarquee />
 
       <section
         id="sections"
         aria-labelledby="sections-heading"
-        className="mx-auto w-full max-w-6xl scroll-mt-24 px-4 pb-4 sm:px-6 lg:px-8"
+        className="mx-auto w-full max-w-6xl scroll-mt-24 px-4 pt-16 sm:px-6 lg:px-8 lg:pt-24"
       >
         <Reveal>
-          <div className="max-w-2xl">
-            <p className="meta">The platform</p>
-            <h2
-              id="sections-heading"
-              className="mt-3 font-serif text-[32px] leading-[1.05] tracking-[-0.025em] text-ink sm:text-[42px]"
-            >
-              Five views of the same field.
-            </h2>
-            <p className="mt-4 text-[14px] leading-relaxed text-muted">
-              Each section answers a different question — what people are saying, what is being
-              reported, what is being built, what is coming up, and who is talking about it.
-            </p>
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <div className="max-w-2xl">
+              <p className="eyebrow">The platform</p>
+              <h2
+                id="sections-heading"
+                className="mt-4 font-serif text-[38px] leading-[0.98] tracking-[-0.03em] text-ink sm:text-[52px]"
+              >
+                Five views of the same field.
+              </h2>
+              <p className="mt-5 text-[14px] leading-relaxed text-muted">
+                Each section answers a different question — what people are saying, what is being
+                reported, what is being built, what is coming up, and who is talking about it.
+              </p>
+            </div>
+            <span className="hidden font-mono text-[10px] uppercase tracking-[0.16em] text-subtle sm:block">
+              01 — 05
+            </span>
           </div>
         </Reveal>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-2 lg:mt-10 lg:grid-cols-12">
+        <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-12">
           <BuzzPanel className="md:col-span-2 lg:col-span-7" />
           <NewsPanel className="md:col-span-2 lg:col-span-5" />
           <TrendingPanel className="md:col-span-1 lg:col-span-4" />
@@ -605,13 +696,18 @@ export function LandingPage() {
 
       <section className="mx-auto mt-16 w-full max-w-6xl px-4 sm:px-6 lg:mt-24 lg:px-8">
         <Reveal>
-          <div className="accent-rule surface-tint relative overflow-hidden rounded-2xl border border-line bg-surface px-6 py-10 sm:px-10 sm:py-12">
-            <div className="flex flex-wrap items-end justify-between gap-8">
-              <div className="max-w-lg">
-                <h2 className="font-serif text-[30px] leading-[1.05] tracking-[-0.025em] text-ink sm:text-[36px]">
+          <div className="panel panel-accent accent-rule relative overflow-hidden px-6 py-12 sm:px-12 sm:py-16">
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-accent/15 blur-3xl"
+            />
+            <div className="relative flex flex-wrap items-end justify-between gap-8">
+              <div className="max-w-xl">
+                <p className="eyebrow">Start here</p>
+                <h2 className="mt-4 font-serif text-[34px] leading-[0.98] tracking-[-0.03em] text-ink sm:text-[46px]">
                   Every good thread starts with a question.
                 </h2>
-                <p className="mt-3 text-[13.5px] leading-relaxed text-muted">
+                <p className="mt-4 text-[13.5px] leading-relaxed text-muted">
                   Bring the bug you cannot reproduce, the design decision you are unsure about, or
                   the library you want a second opinion on. That is what this place is for.
                 </p>
@@ -623,15 +719,15 @@ export function LandingPage() {
                 >
                   {isAuthenticated ? 'Write a post' : 'Join the community'}
                 </Link>
-                <Link to="/news" className={buttonStyles({ variant: 'secondary', size: 'md' })}>
-                  Read the news
+                <Link to="/login" className={buttonStyles({ variant: 'secondary', size: 'md' })}>
+                  Sign in
                   <ArrowUpRight size={14} aria-hidden="true" />
                 </Link>
               </div>
             </div>
 
             {!isAuthenticated ? (
-              <p className="mt-7 text-[11.5px] leading-relaxed text-subtle">
+              <p className="relative mt-8 text-[11.5px] leading-relaxed text-subtle">
                 By creating an account you agree to our{' '}
                 <Link
                   to="/terms"

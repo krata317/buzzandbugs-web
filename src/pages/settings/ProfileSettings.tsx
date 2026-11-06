@@ -1,12 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
-import { Camera, Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import type { SocialKey } from '@/lib/api/types';
 import { useAuth } from '@/providers/AuthProvider';
-import { useUpdateProfile, useUploadAvatar } from '@/features/users/queries';
+import { useUpdateProfile } from '@/features/users/queries';
 import { errorMessage } from '@/lib/api';
 import { validateDisplayName, validateSocialUrl } from '@/lib/validation';
 import { useToast } from '@/providers/ToastProvider';
-import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { Field, Input, Textarea } from '@/components/ui/form';
 import { InlineError } from '@/components/ui/feedback';
@@ -21,14 +19,10 @@ const SOCIAL_FIELDS: Array<{ key: SocialKey; label: string; placeholder: string 
   { key: 'website', label: 'Website', placeholder: 'https://example.com' },
 ];
 
-const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
-
 export function ProfileSettings() {
   const { user, me } = useAuth();
   const updateProfile = useUpdateProfile();
-  const uploadAvatar = useUploadAvatar();
   const toast = useToast();
-  const fileRef = useRef<HTMLInputElement>(null);
 
   const [displayName, setDisplayName] = useState(user?.displayName ?? '');
   const [about, setAbout] = useState(user?.about ?? '');
@@ -41,7 +35,6 @@ export function ProfileSettings() {
     website: '',
   });
   const [error, setError] = useState<string | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -56,34 +49,6 @@ export function ProfileSettings() {
       website: user.socialLinks?.website ?? '',
     });
   }, [user]);
-
-  useEffect(() => {
-    return () => {
-      if (preview) URL.revokeObjectURL(preview);
-    };
-  }, [preview]);
-
-  const onPickAvatar = (file: File | undefined) => {
-    if (!file) return;
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      setError('Avatars must be a JPEG, PNG or WebP image.');
-      return;
-    }
-    if (file.size > MAX_AVATAR_BYTES) {
-      setError('Avatars must be at most 2 MB.');
-      return;
-    }
-
-    setError(null);
-    setPreview(URL.createObjectURL(file));
-    uploadAvatar.mutate(file, {
-      onSuccess: () => toast.push({ title: 'Profile picture updated', tone: 'success' }),
-      onError: (uploadError) => {
-        setPreview(null);
-        setError(errorMessage(uploadError));
-      },
-    });
-  };
 
   const save = () => {
     const nameError = validateDisplayName(displayName);
@@ -121,44 +86,8 @@ export function ProfileSettings() {
     );
   };
 
-  const avatarSrc = preview ?? user?.avatarUrl ?? null;
-
   return (
     <div className="space-y-4">
-      <SettingsCard
-        title="Profile picture"
-        description="JPEG, PNG or WebP, up to 2 MB. Images are re-encoded and stripped of metadata for privacy."
-      >
-        <div className="flex flex-wrap items-center gap-4">
-          <Avatar src={avatarSrc} name={displayName || 'You'} size="xl" ring />
-          <div className="flex flex-col gap-2">
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              className="sr-only"
-              onChange={(event) => onPickAvatar(event.target.files?.[0])}
-            />
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => fileRef.current?.click()}
-              disabled={uploadAvatar.isPending}
-              iconLeft={
-                uploadAvatar.isPending ? (
-                  <Loader2 size={13} className="animate-spin" />
-                ) : (
-                  <Camera size={13} />
-                )
-              }
-            >
-              {uploadAvatar.isPending ? 'Uploading…' : 'Change picture'}
-            </Button>
-            <p className="text-[11.5px] text-subtle">Square images work best.</p>
-          </div>
-        </div>
-      </SettingsCard>
-
       <SettingsCard
         title="Public profile"
         description="Shown on your profile page. Visibility of each part is controlled in Privacy."

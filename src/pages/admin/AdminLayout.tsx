@@ -8,6 +8,7 @@ import {
   ListChecks,
   LogOut,
   Radio,
+  ShieldCheck,
   Users,
 } from 'lucide-react';
 import { adminApi } from '@/lib/api';
@@ -53,13 +54,14 @@ export function AdminLayout() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[radial-gradient(120%_80%_at_50%_-20%,rgb(var(--accent)/0.06),transparent_60%)]">
       <ConnectionBanner />
 
-      <header className="sticky top-0 z-30 border-b border-line bg-canvas/90 backdrop-blur-sm">
-        <div className="mx-auto flex h-14 w-full max-w-[1320px] items-center gap-3 px-4 sm:px-6">
+      <header className="sticky top-0 z-30 border-b border-line bg-canvas/85 backdrop-blur-xl">
+        <div className="mx-auto flex h-16 w-full max-w-[1360px] items-center gap-3 px-4 sm:px-6">
           <Logo />
-          <span className="rounded-full border border-line bg-raised px-2 py-0.5 font-mono text-[9.5px] uppercase tracking-[0.12em] text-muted">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent/[0.08] px-2.5 py-1 font-mono text-[9.5px] uppercase tracking-[0.14em] text-accent">
+            <ShieldCheck size={10} aria-hidden="true" />
             Admin
           </span>
 
@@ -78,12 +80,16 @@ export function AdminLayout() {
             </Button>
           </div>
         </div>
+        <div
+          aria-hidden="true"
+          className="h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent"
+        />
       </header>
 
-      <div className="mx-auto flex w-full max-w-[1320px] gap-6 px-4 py-6 sm:px-6">
+      <div className="mx-auto flex w-full max-w-[1360px] gap-8 px-4 py-7 sm:px-6">
         <nav
           aria-label="Admin sections"
-          className="sticky top-20 hidden h-fit w-[180px] shrink-0 flex-col gap-0.5 md:flex"
+          className="sticky top-24 hidden h-fit w-[184px] shrink-0 flex-col gap-0.5 md:flex"
         >
           {ADMIN_NAV.map((item) => {
             const Icon = item.icon;
@@ -94,8 +100,10 @@ export function AdminLayout() {
                 end={item.end}
                 className={({ isActive }) =>
                   cn(
-                    'focus-ring flex items-center gap-2.5 rounded-md px-2.5 py-2 text-[12.5px] font-medium transition-colors',
-                    isActive ? 'bg-raised text-ink' : 'text-muted hover:bg-raised/60 hover:text-ink',
+                    'focus-ring flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[12.5px] font-medium transition-colors',
+                    isActive
+                      ? 'bg-accent/[0.10] text-ink shadow-soft'
+                      : 'text-muted hover:bg-raised/70 hover:text-ink',
                   )
                 }
               >
@@ -125,10 +133,7 @@ export function AdminLayout() {
                 to={item.to}
                 end={item.end}
                 className={({ isActive }) =>
-                  cn(
-                    'chip shrink-0',
-                    isActive && 'border-accent/30 bg-accent/10 text-accent',
-                  )
+                  cn('chip shrink-0', isActive && 'border-accent/30 bg-accent/10 text-accent')
                 }
               >
                 {item.label}

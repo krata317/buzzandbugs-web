@@ -82,24 +82,24 @@ export function PageHeader({
   return (
     <header
       className={cn(
-        'flex flex-wrap items-end justify-between gap-4 pb-5 animate-rise-in',
+        'flex flex-wrap items-end justify-between gap-4 pb-6 animate-rise-in',
         className,
       )}
     >
       <div className="min-w-0">
-        {eyebrow ? <p className="meta mb-2">{eyebrow}</p> : null}
+        {eyebrow ? <p className="eyebrow mb-3">{eyebrow}</p> : null}
         <h1
           className={cn(
-            'tracking-[-0.02em] text-ink',
+            'tracking-[-0.03em] text-ink',
             serif
-              ? 'font-serif text-[34px] leading-[1.05] sm:text-[40px]'
-              : 'text-[24px] font-semibold leading-tight sm:text-[27px]',
+              ? 'font-serif text-[38px] leading-[0.98] sm:text-[48px]'
+              : 'text-[27px] font-semibold leading-[1.05] sm:text-[32px]',
           )}
         >
           {title}
         </h1>
         {description ? (
-          <p className="mt-2 max-w-xl text-[13.5px] leading-relaxed text-muted">{description}</p>
+          <p className="mt-3 max-w-xl text-[13.5px] leading-relaxed text-muted">{description}</p>
         ) : null}
       </div>
       {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}

@@ -17,6 +17,7 @@ interface AuthContextValue {
   user: MeResponse['user'] | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  pendingDeletion: MeResponse['pendingDeletion'];
   refresh: () => Promise<unknown>;
   signOut: () => Promise<void>;
 }
@@ -56,15 +57,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [queryClient]);
 
   const signOut = useCallback(async () => {
+    // Cancel any in-flight /auth/me request first: if it resolved after the cache was cleared
+    // it would restore the session in the UI and make sign-out look broken until a reload.
+    await queryClient.cancelQueries({ queryKey: queryKeys.me });
+
     try {
       await authApi.logout();
     } catch {
       // The session may already be gone; signing out locally is still correct.
     }
-    queryClient.removeQueries({
-      predicate: (query) => query.queryKey[0] !== 'admin',
-    });
+
     queryClient.setQueryData(queryKeys.me, null);
+    queryClient.removeQueries({
+      predicate: (query) => query.queryKey[0] !== 'admin' && query.queryKey[0] !== 'me',
+    });
   }, [queryClient]);
 
   const value = useMemo<AuthContextValue>(() => {
@@ -74,6 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user: me?.user ?? null,
       isLoading: meQuery.isLoading,
       isAuthenticated: Boolean(me),
+      pendingDeletion: me?.pendingDeletion ?? null,
       refresh: meQuery.refetch,
       signOut,
     };

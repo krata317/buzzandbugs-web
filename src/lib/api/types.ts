@@ -256,7 +256,7 @@ export interface MeResponse {
 
 export interface LoginResponse {
   user: CurrentUser;
-  pendingDeletion: boolean;
+  pendingDeletion: { scheduledFor: string } | null;
   ban: BanState;
 }
 
@@ -295,7 +295,11 @@ export interface AppealCase {
   appealDeadline: string | null;
   appealUsed: boolean;
   canAppeal: boolean;
-  providerCategories: unknown;
+  viewer: {
+    signedIn: boolean;
+    isAuthor: boolean;
+    pendingDeletion: { scheduledFor: string } | null;
+  };
 }
 
 /* ----------------------------------------------------------------- admin */

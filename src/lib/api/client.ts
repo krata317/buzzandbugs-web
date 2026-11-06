@@ -173,63 +173,6 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
 
   return payload as T;
 }
-
-/** Multipart upload. The browser must set the multipart boundary itself. */
-export async function requestForm<T>(
-  path: string,
-  form: FormData,
-  options: { scope?: AuthScope; signal?: AbortSignal } = {},
-): Promise<T> {
-  const scope = options.scope ?? 'user';
-  const headers: Record<string, string> = { accept: 'application/json' };
-  if (scope !== 'none') {
-    const token = readCookie(CSRF_COOKIE[scope]);
-    if (token) headers['x-csrf-token'] = token;
-  }
-
-  let response: Response;
-  try {
-    response = await fetch(`${API_BASE_URL}${path}`, {
-      method: 'POST',
-      headers,
-      credentials: 'include',
-      mode: 'cors',
-      body: form,
-      signal: options.signal,
-    });
-  } catch (error) {
-    if (options.signal?.aborted) throw error;
-    throw new NetworkError();
-  }
-
-  const text = await response.text().catch(() => '');
-  let payload: unknown = null;
-  if (text) {
-    try {
-      payload = JSON.parse(text) as unknown;
-    } catch {
-      payload = null;
-    }
-  }
-
-  if (!response.ok) {
-    const body = payload as ApiErrorBody | null;
-    if (response.status === 401) {
-      window.dispatchEvent(
-        new CustomEvent(UNAUTHORIZED_EVENT, { detail: { scope, path } }),
-      );
-    }
-    throw new ApiError(
-      response.status,
-      body?.error?.code ?? `HTTP_${response.status}`,
-      body?.error?.message ?? statusFallback(response.status),
-      body?.error?.details,
-    );
-  }
-
-  return payload as T;
-}
-
 export const api = {
   get: <T>(path: string, options: Omit<RequestOptions, 'method' | 'body'> = {}) =>
     request<T>(path, { ...options, method: 'GET' }),

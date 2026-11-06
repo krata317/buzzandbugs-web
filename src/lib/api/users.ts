@@ -1,4 +1,4 @@
-import { api, requestForm } from './client';
+import { api } from './client';
 import type {
   ApiEnvelope,
   PageEnvelope,
@@ -67,14 +67,6 @@ export const usersApi = {
         }>
       >('/users/me', input)
       .then((response) => response.data),
-
-  uploadAvatar: (file: File) => {
-    const form = new FormData();
-    form.append('avatar', file);
-    return requestForm<ApiEnvelope<{ avatarUrl: string }>>('/users/me/avatar', form).then(
-      (response) => response.data,
-    );
-  },
 
   follow: (username: string) =>
     api

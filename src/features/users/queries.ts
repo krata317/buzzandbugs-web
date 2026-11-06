@@ -130,12 +130,3 @@ export function useUpdateProfile() {
   });
 }
 
-export function useUploadAvatar() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (file: File) => usersApi.uploadAvatar(file),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: queryKeys.me });
-    },
-  });
-}

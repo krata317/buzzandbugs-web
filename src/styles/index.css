@@ -8,15 +8,15 @@
    graphite with slightly lifted surfaces. Both are hand-tuned, not inverted.
 --------------------------------------------------------------------------- */
 :root {
-  --canvas: 251 250 249;
+  --canvas: 250 249 246;
   --surface: 255 255 255;
-  --raised: 244 242 239;
-  --line: 230 226 220;
-  --line-strong: 211 205 196;
-  --ink: 24 21 17;
-  --muted: 104 97 86;
-  --subtle: 145 137 124;
-  --shadow: 26 22 16;
+  --raised: 243 240 235;
+  --line: 226 220 212;
+  --line-strong: 200 192 180;
+  --ink: 22 18 13;
+  --muted: 97 89 78;
+  --subtle: 141 132 118;
+  --shadow: 28 22 14;
 
   --up: 199 62 36;
   --down: 66 88 165;
@@ -26,17 +26,20 @@
   --accent: 109 74 255;
   --accent-ink: 255 255 255;
   --accent-soft: 109 74 255;
+  /* Warm counterpoint used in gradients and accent rules. */
+  --accent-2: 234 88 12;
+  --accent-2-ink: 255 255 255;
 }
 
 .dark {
-  --canvas: 12 12 14;
-  --surface: 20 20 23;
-  --raised: 27 27 31;
-  --line: 39 39 44;
-  --line-strong: 58 58 65;
-  --ink: 240 239 236;
-  --muted: 156 152 144;
-  --subtle: 118 114 107;
+  --canvas: 10 10 12;
+  --surface: 18 18 21;
+  --raised: 26 26 30;
+  --line: 38 38 44;
+  --line-strong: 58 58 66;
+  --ink: 242 241 238;
+  --muted: 158 154 146;
+  --subtle: 120 116 109;
   --shadow: 0 0 0;
 
   --up: 255 138 110;
@@ -44,9 +47,11 @@
   --danger: 248 113 113;
   --danger-ink: 26 8 8;
 
-  --accent: 166 139 250;
+  --accent: 167 139 250;
   --accent-ink: 14 12 22;
-  --accent-soft: 166 139 250;
+  --accent-soft: 167 139 250;
+  --accent-2: 255 156 110;
+  --accent-2-ink: 26 12 4;
 }
 
 [data-accent='violet'] {
@@ -175,6 +180,48 @@
     @apply rounded-xl border border-line bg-surface;
   }
 
+  /* -------------------------------------------------------------------------
+     Surfaces
+     One layered panel primitive is used everywhere — landing, feed, settings
+     and admin — so depth is consistent instead of re-invented per page.
+  ------------------------------------------------------------------------- */
+  .panel {
+    @apply relative rounded-2xl border border-line bg-surface;
+    box-shadow:
+      0 1px 1px rgb(var(--shadow) / 0.04),
+      0 24px 48px -40px rgb(var(--shadow) / 0.45);
+  }
+
+  .panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background-image: linear-gradient(180deg, rgb(255 255 255 / 0.05), transparent 28%);
+  }
+
+  .panel-accent {
+    background-image:
+      radial-gradient(120% 130% at 0% 0%, rgb(var(--accent) / 0.12), transparent 55%),
+      radial-gradient(90% 90% at 100% 0%, rgb(var(--accent-2) / 0.07), transparent 55%);
+  }
+
+  .panel-hover {
+    transition:
+      transform 340ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 340ms cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 200ms ease-out;
+  }
+
+  .panel-hover:hover {
+    transform: translateY(-3px);
+    border-color: rgb(var(--accent) / 0.32);
+    box-shadow:
+      0 2px 4px rgb(var(--shadow) / 0.05),
+      0 36px 64px -44px rgb(var(--shadow) / 0.55);
+  }
+
   .card-interactive {
     @apply card transition-[border-color,box-shadow,transform] duration-300 ease-out;
   }
@@ -182,6 +229,32 @@
   .card-interactive:hover {
     @apply border-lineStrong shadow-soft;
     transform: translateY(-2px);
+  }
+
+  /* Small uppercase label with a leading accent rule. */
+  .eyebrow {
+    @apply inline-flex items-center gap-2.5 font-mono text-[10.5px] uppercase tracking-[0.16em] text-subtle;
+  }
+
+  .eyebrow::before {
+    content: '';
+    display: block;
+    width: 20px;
+    height: 1px;
+    background-image: linear-gradient(90deg, rgb(var(--accent)), rgb(var(--accent) / 0));
+  }
+
+  .rule-gradient {
+    height: 1px;
+    background-image: linear-gradient(90deg, transparent, rgb(var(--line-strong)), transparent);
+  }
+
+  .stat-value {
+    @apply font-mono text-[26px] leading-none tracking-[-0.02em] text-ink;
+  }
+
+  .stat-label {
+    @apply font-mono text-[9.5px] uppercase tracking-[0.12em] text-subtle;
   }
 
   .field {
@@ -210,7 +283,7 @@
   }
 
   .nav-link {
-    @apply relative flex items-center gap-3 rounded-md px-3 py-2 text-[14px] font-medium
+    @apply relative flex items-center gap-3 rounded-lg px-3 py-2 text-[14px] font-medium
       text-muted transition-colors duration-150;
   }
 
@@ -219,12 +292,19 @@
   }
 
   .nav-link[aria-current='page'] {
-    @apply bg-raised text-ink;
+    color: rgb(var(--ink));
+    background-image: linear-gradient(
+      90deg,
+      rgb(var(--accent) / 0.16),
+      rgb(var(--accent) / 0.03)
+    );
   }
 
   .nav-link[aria-current='page']::before {
     content: '';
-    @apply absolute left-0 top-1/2 h-4 w-[3px] -translate-y-1/2 rounded-r-full bg-accent;
+    @apply absolute left-0 top-1/2 h-[58%] w-[3px] -translate-y-1/2 rounded-r-full;
+    background-color: rgb(var(--accent));
+    box-shadow: 0 0 14px rgb(var(--accent) / 0.55);
   }
 
   .chip {
@@ -396,6 +476,100 @@
       animation: none;
       filter: blur(48px);
     }
+  }
+
+  /* -------------------------------------------------------------------------
+     Motion primitives
+  ------------------------------------------------------------------------- */
+  @keyframes page-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .page-enter {
+    animation: page-in 340ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes stagger-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  [data-stagger] > * {
+    animation: stagger-in 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  [data-stagger] > *:nth-child(2) {
+    animation-delay: 60ms;
+  }
+  [data-stagger] > *:nth-child(3) {
+    animation-delay: 120ms;
+  }
+  [data-stagger] > *:nth-child(4) {
+    animation-delay: 180ms;
+  }
+  [data-stagger] > *:nth-child(5) {
+    animation-delay: 240ms;
+  }
+  [data-stagger] > *:nth-child(6) {
+    animation-delay: 300ms;
+  }
+  [data-stagger] > *:nth-child(n + 7) {
+    animation-delay: 340ms;
+  }
+
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  .marquee {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  }
+
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee 44s linear infinite;
+  }
+
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+
+  @keyframes orbit-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes orbit-counter {
+    to {
+      transform: rotate(-360deg);
+    }
+  }
+
+  .orbit-ring {
+    animation: orbit-spin 52s linear infinite;
+  }
+
+  .orbit-node {
+    animation: orbit-counter 52s linear infinite;
   }
 
   /* Podcast artwork fallback --------------------------------------------- */
