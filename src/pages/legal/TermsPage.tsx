@@ -14,8 +14,7 @@ export function TermsPage() {
       <section>
         <h2>1. Who we are</h2>
         <p>
-          Buzz and Bugs is a community platform for developers, operated by [operator name]
-          (&ldquo;we&rdquo;, &ldquo;us&rdquo;). You can reach us at [legal contact email]. By
+          Buzz and Bugs is a community platform for developers. You can reach us at buzzandbugs.admin@gmail.com. By
           creating an account or using the platform you agree to these terms. If you do not agree,
           please do not use the service.
         </p>
@@ -166,7 +165,7 @@ export function TermsPage() {
       <section>
         <h2>10. Contact</h2>
         <p>
-          Questions about these terms: [legal contact email]. For privacy questions, see our{' '}
+          Questions about these terms: buzzandbugs.admin@gmail.com. For privacy questions, see our{' '}
           <Link to="/privacy">Privacy Policy</Link>.
         </p>
       </section>

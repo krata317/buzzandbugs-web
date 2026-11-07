@@ -8,7 +8,7 @@ export function PrivacyPage() {
   return (
     <LegalPage
       title="Privacy Policy"
-      updated="6 November 2026"
+      updated="7 November 2026"
       intro="What Buzz and Bugs collects, why it is collected, how long it is kept, and what you can ask us to do with it."
     >
       <section>
@@ -144,7 +144,7 @@ export function PrivacyPage() {
           </li>
           <li>
             You can ask for a copy of your account data, or ask us to correct it, by writing to
-            [privacy contact email].
+            buzzandbugs.admin@gmail.com.
           </li>
           <li>
             You can object to a moderation decision through the appeal link sent to you, or by
@@ -179,7 +179,7 @@ export function PrivacyPage() {
         <h2>9. Changes and contact</h2>
         <p>
           Material changes to this policy will be announced on the platform. Privacy questions and
-          requests: [privacy contact email]. See also our <Link to="/terms">Terms of Service</Link>.
+          requests: buzzandbugs.admin@gmail.com. See also our <Link to="/terms">Terms of Service</Link>.
         </p>
       </section>
     </LegalPage>

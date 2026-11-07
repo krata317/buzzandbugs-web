@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import type { ExternalItem } from '@/lib/api/types';
 import { cn } from '@/lib/cn';
-import { cleanText, hostOf, relativeTime } from '@/lib/format';
+import { cleanText, hostOf } from '@/lib/format';
 
 function Thumbnail({ src, className }: { src: string | null; className?: string }) {
   const [failed, setFailed] = useState(false);
@@ -41,12 +41,6 @@ function Meta({ item }: { item: ExternalItem }) {
       {author ? <span className="max-w-[180px] truncate">{author}</span> : null}
       {author && host ? <span aria-hidden="true">·</span> : null}
       {host ? <span className="truncate">{host}</span> : null}
-      {item.publishedAt ? (
-        <>
-          <span aria-hidden="true">·</span>
-          <time dateTime={item.publishedAt}>{relativeTime(item.publishedAt)}</time>
-        </>
-      ) : null}
     </div>
   );
 }
@@ -126,7 +120,6 @@ export function NewsCompactRow({ item }: { item: ExternalItem }) {
       </h3>
       <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-subtle">
         {hostOf(item.url)}
-        {item.publishedAt ? ` · ${relativeTime(item.publishedAt)}` : ''}
       </p>
     </a>
   );

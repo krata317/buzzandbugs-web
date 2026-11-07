@@ -19,7 +19,7 @@ import { buttonStyles } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/feedback';
 import { Reveal } from '@/components/ui/Reveal';
 import { PodcastArtworkFallback } from '@/components/external/PodcastCard';
-import { cleanText, formatCount, formatDuration, hostOf, relativeTime } from '@/lib/format';
+import { cleanText, formatCount, formatDuration, hostOf } from '@/lib/format';
 import { numberMeta, stringMeta } from '@/lib/sections';
 import { eventStatus } from '@/components/external/EventCard';
 import { cn } from '@/lib/cn';
@@ -192,7 +192,6 @@ function NewsPanel({ className }: { className?: string }) {
                   </span>
                   <span className="mt-2 block font-mono text-[9.5px] uppercase tracking-[0.09em] text-subtle">
                     {cleanText(feature.author) || hostOf(feature.url)}
-                    {feature.publishedAt ? ` · ${relativeTime(feature.publishedAt)}` : ''}
                   </span>
                 </span>
               </a>
